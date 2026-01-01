@@ -28,8 +28,6 @@ bunx convex dev
 bun run dev
 ```
 
-Open http://localhost:5173 to see your app.
-
 ## Scripts
 
 | Command              | Description                    |
@@ -160,9 +158,6 @@ bunx convex env get API_KEY
 
 # Remove a variable
 bunx convex env remove API_KEY
-
-# Open dashboard to manage vars via UI
-bunx convex dashboard
 ```
 
 ### Adding New Integrations
