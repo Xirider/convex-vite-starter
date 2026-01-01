@@ -133,20 +133,27 @@ These are auto-generated when you run `bunx convex dev` for the first time.
 
 ### Runtime Variables (Convex Cloud)
 
-These are used by your Convex functions and **must be set on the deployment**:
+These are used by your Convex functions and **must be set on the deployment**.
+
+**Pre-configured variables** (already set, don't overwrite):
+- `AUTH_PRIVATE_KEY` — For Convex Auth JWT signing
+- `SITE_URL` — Your app's URL for auth redirects
+- `VIKTOR_SPACES_*` — Email sending configuration
+
+**Adding your own variables**:
 
 ```bash
-# Required for Auth
-bunx convex env set AUTH_PRIVATE_KEY "$(cat private_key.pem | base64)"
-bunx convex env set SITE_URL "https://your-app.com"
+# Example: Add OpenAI integration
+bunx convex env set OPENAI_API_KEY "sk-..."
 
-# Required for Email (Viktor Spaces projects)
-bunx convex env set VIKTOR_SPACES_API_URL "https://api.viktor.space"
-bunx convex env set VIKTOR_SPACES_PROJECT_NAME "my-project"
-bunx convex env set VIKTOR_SPACES_PROJECT_SECRET "secret-key"
+# Example: Add Stripe
+bunx convex env set STRIPE_SECRET_KEY "sk_live_..."
+
+# Example: Add a feature flag
+bunx convex env set ENABLE_BETA_FEATURES "true"
 ```
 
-**Note**: These are NOT read from `.env.local` — they must be set via CLI or dashboard.
+**Note**: Runtime vars are NOT read from `.env.local` — they must be set via CLI or dashboard.
 
 ### CLI Commands
 
