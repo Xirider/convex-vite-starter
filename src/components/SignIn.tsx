@@ -52,9 +52,9 @@ export function SignIn() {
                 setLoading(false);
               }
             }}
-            className="flex flex-col gap-4"
+            className="space-y-4"
           >
-            <div className="flex flex-col gap-2">
+            <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
@@ -64,7 +64,7 @@ export function SignIn() {
                 required
               />
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
@@ -120,9 +120,9 @@ export function SignIn() {
                 setLoading(false);
               }
             }}
-            className="flex flex-col gap-4"
+            className="space-y-4"
           >
-            <div className="flex flex-col gap-2">
+            <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
@@ -168,9 +168,9 @@ export function SignIn() {
               const code = formData.get("code") as string;
               setStep({ type: "new-password", email: step.email, code });
             }}
-            className="flex flex-col gap-4"
+            className="space-y-4"
           >
-            <div className="flex flex-col gap-2">
+            <div className="space-y-2">
               <Label htmlFor="code">Reset Code</Label>
               <Input
                 id="code"
@@ -222,9 +222,9 @@ export function SignIn() {
               setLoading(false);
             }
           }}
-          className="flex flex-col gap-4"
+          className="space-y-4"
         >
-          <div className="flex flex-col gap-2">
+          <div className="space-y-2">
             <Label htmlFor="newPassword">New Password</Label>
             <Input
               id="newPassword"
