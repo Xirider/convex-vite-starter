@@ -130,7 +130,9 @@ import { useTheme } from "@/contexts/ThemeContext";
 
 ## Convex Cheatsheet
 
-Quick reference for common gotchas.
+**Queries** = read data (cached, reactive, real-time). **Mutations** = write data (transactional, atomic). **Actions** = side effects (external APIs, no direct DB access).
+
+Quick reference for common gotchas:
 
 ### Function Syntax
 
@@ -258,16 +260,16 @@ const cache: Record<Id<"users">, string> = {};
 
 ### Validators Reference
 
-| Type | Validator | Example |
-|------|-----------|---------|
-| String | `v.string()` | `"hello"` |
-| Number | `v.number()` | `42`, `3.14` |
-| Boolean | `v.boolean()` | `true` |
-| Null | `v.null()` | `null` |
-| ID | `v.id("tableName")` | `"jh7..."` |
-| Array | `v.array(v.string())` | `["a", "b"]` |
-| Object | `v.object({ name: v.string() })` | `{ name: "Jo" }` |
-| Optional | `v.optional(v.string())` | `undefined` or `"hi"` |
-| Union | `v.union(v.string(), v.null())` | `"hi"` or `null` |
-| Literal | `v.literal("admin")` | `"admin"` |
-| Record | `v.record(v.string(), v.number())` | `{ a: 1, b: 2 }` |
+| Type     | Validator                          | Example               |
+| -------- | ---------------------------------- | --------------------- |
+| String   | `v.string()`                       | `"hello"`             |
+| Number   | `v.number()`                       | `42`, `3.14`          |
+| Boolean  | `v.boolean()`                      | `true`                |
+| Null     | `v.null()`                         | `null`                |
+| ID       | `v.id("tableName")`                | `"jh7..."`            |
+| Array    | `v.array(v.string())`              | `["a", "b"]`          |
+| Object   | `v.object({ name: v.string() })`   | `{ name: "Jo" }`      |
+| Optional | `v.optional(v.string())`           | `undefined` or `"hi"` |
+| Union    | `v.union(v.string(), v.null())`    | `"hi"` or `null`      |
+| Literal  | `v.literal("admin")`               | `"admin"`             |
+| Record   | `v.record(v.string(), v.number())` | `{ a: 1, b: 2 }`      |
