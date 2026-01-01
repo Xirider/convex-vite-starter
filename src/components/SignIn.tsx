@@ -1,5 +1,9 @@
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useState } from "react";
+import { Button } from "./ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
 
 export function SignIn() {
   const { signIn } = useAuthActions();
@@ -12,9 +16,10 @@ export function SignIn() {
     e.preventDefault();
     setError("");
     setLoading(true);
+
     try {
       await signIn("password", { email, password, flow: "signIn" });
-    } catch (err) {
+    } catch {
       setError("Invalid email or password");
     } finally {
       setLoading(false);
@@ -22,34 +27,40 @@ export function SignIn() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 bg-white p-6 rounded-lg shadow">
-      <h2 className="text-xl font-semibold text-center">Sign In</h2>
-      {error && (
-        <div className="bg-red-50 text-red-600 p-3 rounded text-sm">{error}</div>
-      )}
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        required
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        required
-      />
-      <button
-        type="submit"
-        disabled={loading}
-        className="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600 disabled:opacity-50"
-      >
-        {loading ? "Signing in..." : "Sign In"}
-      </button>
-    </form>
+    <Card>
+      <CardHeader>
+        <CardTitle>Sign In</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              placeholder="••••••••"
+              required
+            />
+          </div>
+          {error && <p className="text-sm text-destructive">{error}</p>}
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? "Signing in..." : "Sign In"}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   );
 }

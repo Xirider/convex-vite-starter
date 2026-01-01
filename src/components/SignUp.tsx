@@ -1,75 +1,79 @@
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useState } from "react";
+import { Button } from "./ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
 
 export function SignUp() {
   const { signIn } = useAuthActions();
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-
-    if (password !== confirmPassword) {
-      setError("Passwords don't match");
-      return;
-    }
-
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters");
-      return;
-    }
-
     setLoading(true);
+
     try {
-      await signIn("password", { email, password, flow: "signUp" });
-    } catch (err) {
-      setError("Failed to create account. Email may already be in use.");
+      await signIn("password", { name, email, password, flow: "signUp" });
+    } catch {
+      setError("Could not create account. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 bg-white p-6 rounded-lg shadow">
-      <h2 className="text-xl font-semibold text-center">Create Account</h2>
-      {error && (
-        <div className="bg-red-50 text-red-600 p-3 rounded text-sm">{error}</div>
-      )}
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        required
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        required
-      />
-      <input
-        type="password"
-        placeholder="Confirm Password"
-        value={confirmPassword}
-        onChange={(e) => setConfirmPassword(e.target.value)}
-        className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        required
-      />
-      <button
-        type="submit"
-        disabled={loading}
-        className="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600 disabled:opacity-50"
-      >
-        {loading ? "Creating account..." : "Sign Up"}
-      </button>
-    </form>
+    <Card>
+      <CardHeader>
+        <CardTitle>Create Account</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">Name</Label>
+            <Input
+              id="name"
+              type="text"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              placeholder="Your name"
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              placeholder="••••••••"
+              minLength={6}
+              required
+            />
+          </div>
+          {error && <p className="text-sm text-destructive">{error}</p>}
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? "Creating account..." : "Sign Up"}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   );
 }

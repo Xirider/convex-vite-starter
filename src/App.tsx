@@ -1,75 +1,109 @@
 import { useConvexAuth } from "convex/react";
+import { useState } from "react";
+import ErrorBoundary from "./components/ErrorBoundary";
 import { SignIn } from "./components/SignIn";
 import { SignUp } from "./components/SignUp";
+import { Button } from "./components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card";
+import { Toaster } from "./components/ui/sonner";
+import { TooltipProvider } from "./components/ui/tooltip";
 import { UserMenu } from "./components/UserMenu";
-import { useState } from "react";
+import { ThemeProvider } from "./contexts/ThemeContext";
 
-function App() {
-  const { isAuthenticated, isLoading } = useConvexAuth();
+function AuthScreen() {
   const [showSignUp, setShowSignUp] = useState(false);
+
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <h1 className="text-3xl font-bold text-center mb-8">Welcome</h1>
+        {showSignUp ? (
+          <>
+            <SignUp />
+            <p className="text-center mt-4 text-muted-foreground">
+              Already have an account?{" "}
+              <Button
+                variant="link"
+                className="p-0 h-auto"
+                onClick={() => setShowSignUp(false)}
+              >
+                Sign in
+              </Button>
+            </p>
+          </>
+        ) : (
+          <>
+            <SignIn />
+            <p className="text-center mt-4 text-muted-foreground">
+              Don't have an account?{" "}
+              <Button
+                variant="link"
+                className="p-0 h-auto"
+                onClick={() => setShowSignUp(true)}
+              >
+                Sign up
+              </Button>
+            </p>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Dashboard() {
+  return (
+    <div className="min-h-screen">
+      <header className="border-b bg-card">
+        <div className="container py-4 flex justify-between items-center">
+          <h1 className="text-xl font-semibold">My App</h1>
+          <UserMenu />
+        </div>
+      </header>
+      <main className="container py-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>Dashboard</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">
+              Welcome! You're now authenticated. Start building your app here.
+            </p>
+          </CardContent>
+        </Card>
+      </main>
+    </div>
+  );
+}
+
+function AppContent() {
+  const { isAuthenticated, isLoading } = useConvexAuth();
 
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-gray-500">Loading...</div>
+        <div className="text-muted-foreground">Loading...</div>
       </div>
     );
   }
 
   if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-        <div className="w-full max-w-md">
-          <h1 className="text-3xl font-bold text-center mb-8">Welcome</h1>
-          {showSignUp ? (
-            <>
-              <SignUp />
-              <p className="text-center mt-4 text-gray-600">
-                Already have an account?{" "}
-                <button
-                  onClick={() => setShowSignUp(false)}
-                  className="text-blue-500 hover:underline"
-                >
-                  Sign in
-                </button>
-              </p>
-            </>
-          ) : (
-            <>
-              <SignIn />
-              <p className="text-center mt-4 text-gray-600">
-                Don't have an account?{" "}
-                <button
-                  onClick={() => setShowSignUp(true)}
-                  className="text-blue-500 hover:underline"
-                >
-                  Sign up
-                </button>
-              </p>
-            </>
-          )}
-        </div>
-      </div>
-    );
+    return <AuthScreen />;
   }
 
+  return <Dashboard />;
+}
+
+function App() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-xl font-semibold">My App</h1>
-          <UserMenu />
-        </div>
-      </header>
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-2xl font-bold mb-4">Dashboard</h2>
-          <p className="text-gray-600">
-            Welcome! You're now authenticated. Start building your app here.
-          </p>
-        </div>
-      </main>
-    </div>
+    <ErrorBoundary>
+      <ThemeProvider defaultTheme="light" switchable>
+        <TooltipProvider>
+          <Toaster />
+          <AppContent />
+        </TooltipProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }
 
