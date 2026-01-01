@@ -6,10 +6,9 @@ async function main() {
   const helper = await createPageHelper();
   const { page } = helper;
 
-  console.log("\n📸 Taking screenshot of authenticated dashboard...");
-  await helper.screenshot("demo-test.png");
+  console.log("📍 Testing /dashboard route...");
+  await helper.screenshot("demo-dashboard.png");
 
-  console.log("\n🔍 Verifying authenticated state...");
   const hasDashboard = await page
     .locator("text=Dashboard")
     .isVisible()
@@ -18,24 +17,37 @@ async function main() {
     .locator("text=Welcome")
     .isVisible()
     .catch(() => false);
-  const hasUserMenu = await page
-    .locator(
-      "[data-testid='user-menu'], button:has-text('Sign out'), .user-menu",
-    )
-    .first()
-    .isVisible()
-    .catch(() => false);
 
   console.log(`   ✓ Dashboard visible: ${hasDashboard}`);
   console.log(`   ✓ Welcome message: ${hasWelcome}`);
-  console.log(`   ✓ User menu visible: ${hasUserMenu}`);
+  console.log(`   ✓ URL: ${page.url()}`);
+
+  console.log("\n📍 Testing /settings route...");
+  await helper.goto("/settings");
+  await page
+    .waitForSelector("text=Settings", { timeout: 5000 })
+    .catch(() => {});
+  await helper.screenshot("demo-settings.png");
+
+  const pageContent = await page.locator("body").innerText();
+  const hasSettings = pageContent.includes("Settings");
+  console.log(`   ✓ Settings visible: ${hasSettings}`);
+  console.log(`   ✓ URL: ${page.url()}`);
+
+  console.log("\n📍 Testing redirect from / to /dashboard...");
+  await helper.goto("/");
+  const redirectedToDashboard = page.url().includes("/dashboard");
+  console.log(`   ✓ Redirected to dashboard: ${redirectedToDashboard}`);
+  console.log(`   ✓ URL: ${page.url()}`);
 
   await helper.printDebugInfo();
 
-  if (hasDashboard) {
-    console.log("\n✅ Demo test PASSED - User is authenticated!");
+  const allPassed = hasDashboard && hasSettings && redirectedToDashboard;
+
+  if (allPassed) {
+    console.log("\n✅ Demo test PASSED - All routes working!");
   } else {
-    console.log("\n❌ Demo test FAILED - User is not authenticated");
+    console.log("\n❌ Demo test FAILED - Some routes not working");
     await helper.close();
     process.exit(1);
   }

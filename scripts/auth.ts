@@ -116,29 +116,32 @@ export class PageHelper {
     return path;
   }
 
+  async goto(path: string): Promise<void> {
+    const url = path.startsWith("http") ? path : `${APP_URL}${path}`;
+    await this.page.goto(url, { waitUntil: "networkidle" });
+  }
+
   async close(): Promise<void> {
     await this.browser.close();
   }
 }
 
-export async function ensureTestUserExists(page: Page): Promise<void> {
-  await page.goto(APP_URL, { waitUntil: "networkidle" });
+async function isOnDashboard(page: Page): Promise<boolean> {
+  return (
+    page.url().includes("/dashboard") ||
+    (await page
+      .locator("text=Dashboard")
+      .isVisible()
+      .catch(() => false))
+  );
+}
 
-  const isLoggedIn = await page
-    .locator("text=Dashboard")
-    .isVisible()
-    .catch(() => false);
-  if (isLoggedIn) {
+export async function ensureTestUserExists(page: Page): Promise<void> {
+  await page.goto(`${APP_URL}/signup`, { waitUntil: "networkidle" });
+
+  if (await isOnDashboard(page)) {
     console.log("[Auth] Already logged in");
     return;
-  }
-
-  const signUpButton = page.locator("button:has-text('Sign up')");
-  const hasSignUp = await signUpButton.isVisible().catch(() => false);
-
-  if (hasSignUp) {
-    await signUpButton.click();
-    await page.waitForTimeout(300);
   }
 
   const nameInput = page.locator("input[name='name']");
@@ -152,11 +155,7 @@ export async function ensureTestUserExists(page: Page): Promise<void> {
     await page.locator("button[type='submit']").click();
     await page.waitForTimeout(1000);
 
-    const dashboardVisible = await page
-      .locator("text=Dashboard")
-      .isVisible()
-      .catch(() => false);
-    if (dashboardVisible) {
+    if (await isOnDashboard(page)) {
       console.log("[Auth] Test user created and logged in");
       return;
     }
@@ -174,22 +173,11 @@ export async function ensureTestUserExists(page: Page): Promise<void> {
 }
 
 export async function signInTestUser(page: Page): Promise<void> {
-  await page.goto(APP_URL, { waitUntil: "networkidle" });
+  await page.goto(`${APP_URL}/login`, { waitUntil: "networkidle" });
 
-  const isLoggedIn = await page
-    .locator("text=Dashboard")
-    .isVisible()
-    .catch(() => false);
-  if (isLoggedIn) {
+  if (await isOnDashboard(page)) {
     console.log("[Auth] Already logged in");
     return;
-  }
-
-  const signInLink = page.locator("button:has-text('Sign in')");
-  const hasSignInLink = await signInLink.isVisible().catch(() => false);
-  if (hasSignInLink) {
-    await signInLink.click();
-    await page.waitForTimeout(300);
   }
 
   console.log("[Auth] Signing in as test user...");
@@ -199,21 +187,17 @@ export async function signInTestUser(page: Page): Promise<void> {
 
   await page.waitForTimeout(3000);
 
-  const dashboardVisible = await page
-    .locator("text=Dashboard")
-    .isVisible()
-    .catch(() => false);
-
-  if (!dashboardVisible) {
+  if (!(await isOnDashboard(page))) {
     console.log("[Auth] Refreshing page to check auth state...");
     await page.reload({ waitUntil: "networkidle" });
     await page.waitForTimeout(2000);
   }
 
   try {
-    await page.waitForSelector("text=Dashboard", { timeout: 10000 });
+    await page.waitForURL("**/dashboard", { timeout: 10000 });
     console.log("[Auth] Signed in successfully");
   } catch {
+    await mkdir(TMP_DIR, { recursive: true });
     await page.screenshot({ path: join(TMP_DIR, "auth-debug.png") });
     const content = await page.locator("body").innerText();
     console.log("[Auth] Page content after sign-in attempt:", content);
@@ -247,13 +231,9 @@ export async function createAuthenticatedBrowser(): Promise<{
   );
   const page = await context.newPage();
 
-  await page.goto(APP_URL, { waitUntil: "networkidle" });
-  const isLoggedIn = await page
-    .locator("text=Dashboard")
-    .isVisible()
-    .catch(() => false);
+  await page.goto(`${APP_URL}/dashboard`, { waitUntil: "networkidle" });
 
-  if (!isLoggedIn) {
+  if (!(await isOnDashboard(page))) {
     await ensureTestUserExists(page);
     await saveAuthState(page);
   }
@@ -271,13 +251,9 @@ export async function createPageHelper(): Promise<PageHelper> {
 
   const helper = new PageHelper(page, browser, context);
 
-  await page.goto(APP_URL, { waitUntil: "networkidle" });
-  const isLoggedIn = await page
-    .locator("text=Dashboard")
-    .isVisible()
-    .catch(() => false);
+  await page.goto(`${APP_URL}/dashboard`, { waitUntil: "networkidle" });
 
-  if (!isLoggedIn) {
+  if (!(await isOnDashboard(page))) {
     await ensureTestUserExists(page);
     await saveAuthState(page);
   }
