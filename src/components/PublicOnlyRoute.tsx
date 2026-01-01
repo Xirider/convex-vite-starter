@@ -16,26 +16,26 @@ function AuthFormSkeleton() {
         <Skeleton className="h-9 w-32 mx-auto mb-8" />
         <Card>
           <CardHeader>
-            <CardTitle>
-              <Skeleton className="h-6 w-32" />
-            </CardTitle>
-            <CardDescription>
-              <Skeleton className="h-4 w-48" />
-            </CardDescription>
+            <Skeleton className="h-6 w-32" />
+            <Skeleton className="h-4 w-48" />
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-12" />
+          <CardContent className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-5 w-12" />
               <Skeleton className="h-10 w-full" />
             </div>
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-16" />
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-5 w-12" />
               <Skeleton className="h-10 w-full" />
             </div>
-            <Skeleton className="h-10 w-full" />
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-5 w-16" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <Skeleton className="h-9 w-full" />
           </CardContent>
         </Card>
-        <Skeleton className="h-4 w-48 mx-auto mt-4" />
+        <Skeleton className="h-5 w-48 mx-auto mt-4" />
       </div>
     </div>
   );
