@@ -3,11 +3,11 @@ import { useState } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { SignIn } from "./components/SignIn";
 import { SignUp } from "./components/SignUp";
+import { UserMenu } from "./components/UserMenu";
 import { Button } from "./components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card";
 import { Toaster } from "./components/ui/sonner";
 import { TooltipProvider } from "./components/ui/tooltip";
-import { UserMenu } from "./components/UserMenu";
 import { ThemeProvider } from "./contexts/ThemeContext";
 
 function AuthScreen() {

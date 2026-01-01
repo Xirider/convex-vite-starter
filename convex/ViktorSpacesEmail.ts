@@ -21,7 +21,7 @@ export const ViktorSpacesEmail = Email({
     if (!apiUrl || !projectName || !projectSecret) {
       throw new Error(
         "Viktor Spaces environment variables not configured. " +
-          "Required: VIKTOR_SPACES_API_URL, VIKTOR_SPACES_PROJECT_NAME, VIKTOR_SPACES_PROJECT_SECRET"
+          "Required: VIKTOR_SPACES_API_URL, VIKTOR_SPACES_PROJECT_NAME, VIKTOR_SPACES_PROJECT_SECRET",
       );
     }
 
@@ -55,7 +55,10 @@ export const ViktorSpacesEmail = Email({
       throw new Error(`Failed to send verification email: ${error}`);
     }
 
-    const result = (await response.json()) as { success: boolean; error?: string };
+    const result = (await response.json()) as {
+      success: boolean;
+      error?: string;
+    };
     if (!result.success) {
       throw new Error(`Email sending failed: ${result.error}`);
     }

@@ -26,7 +26,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
 
 export const currentUser = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async ctx => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
     return await ctx.db.get(userId);

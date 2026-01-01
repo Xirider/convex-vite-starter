@@ -1,6 +1,6 @@
-import { chromium } from "playwright";
 import { mkdir } from "fs/promises";
 import { join } from "path";
+import { chromium } from "playwright";
 
 const APP_URL = process.env.APP_URL || "http://localhost:5173";
 const TMP_DIR = join(import.meta.dirname, "..", "tmp");

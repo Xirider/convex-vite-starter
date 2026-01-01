@@ -10,6 +10,7 @@ A production-ready full-stack web app template.
 - **React 19** — UI framework
 - **Tailwind CSS v4** — CSS-native utility styling with theming
 - **shadcn/ui** — 53 beautiful, accessible components
+- **Biome** — Fast linter & formatter (replaces ESLint + Prettier)
 - **TypeScript** — Full type safety
 - **Bun** — Fast package manager & runtime
 
@@ -32,9 +33,9 @@ bun run dev
 | -------------------- | ------------------------------ |
 | `bun run dev`        | Start Vite dev server          |
 | `bun run build`      | Build for production           |
-| `bun run check`      | TypeScript type check          |
-| `bun run format`     | Format with Prettier           |
-| `bun run lint`       | Lint with ESLint               |
+| `bun run check`      | Lint + format check with Biome |
+| `bun run format`     | Format & fix with Biome        |
+| `bun run lint`       | Lint only with Biome           |
 | `bun run screenshot` | Take screenshot of running app |
 
 ## Project Structure
@@ -52,6 +53,7 @@ bun run dev
 │   ├── lib/             # cn() utility
 │   ├── App.tsx          # Main app with providers
 │   └── index.css        # Tailwind theme
+├── biome.json           # Biome config (linting + formatting)
 ├── components.json      # shadcn CLI config
 └── package.json
 ```

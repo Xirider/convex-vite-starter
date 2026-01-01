@@ -24,7 +24,9 @@ export function UserMenu() {
         <Button variant="ghost" size="icon" className="relative">
           <Avatar className="h-8 w-8">
             <AvatarFallback>
-              {user?.name?.charAt(0).toUpperCase() || <User className="h-4 w-4" />}
+              {user?.name?.charAt(0).toUpperCase() || (
+                <User className="h-4 w-4" />
+              )}
             </AvatarFallback>
           </Avatar>
         </Button>
