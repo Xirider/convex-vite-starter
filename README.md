@@ -2,6 +2,8 @@
 
 A production-ready full-stack web app template.
 
+> **Viktor Spaces projects**: Your project is already configured with Convex, auth, and email. Skip to [Adding New Variables](#adding-new-variables) if you need to add integrations.
+
 ## Stack
 
 - **Convex** — Real-time backend & database
@@ -16,16 +18,17 @@ A production-ready full-stack web app template.
 
 ## Quick Start
 
-```bash
-# Install dependencies
-bun install
+Your project is already set up. To start developing:
 
-# Start Convex backend (in one terminal)
+```bash
+# Start Convex backend (watches for changes)
 bunx convex dev
 
-# Start frontend (in another terminal)
+# In another terminal, start frontend
 bun run dev
 ```
+
+Open http://localhost:5173 to see your app.
 
 ## Scripts
 
@@ -112,48 +115,36 @@ App-level `ErrorBoundary` catches errors gracefully.
 
 ## Environment Variables
 
-There are **two types** of environment variables:
+Your project comes **pre-configured** with all required environment variables. You only need to add new ones when integrating additional services.
 
-1. **Local/Build-time** (`.env.local`) — Used by CLI and Vite during build
-2. **Runtime** (Convex Cloud) — Used by Convex functions at runtime
+### What's Already Set Up
 
-### Local Development (`.env.local`)
+**Local file** (`.env.local`) — already exists, don't modify:
+- `CONVEX_DEPLOY_KEY` — Authenticates CLI with your deployment
+- `VITE_CONVEX_URL` — Frontend connects to your Convex backend
 
-Create a `.env.local` file (gitignored):
-
-```bash
-# Tells CLI which deployment to use
-CONVEX_DEPLOY_KEY=prod:fancy-animal-123|abc123...
-
-# Frontend build (Vite injects this)
-VITE_CONVEX_URL=https://fancy-animal-123.convex.cloud
-```
-
-These are auto-generated when you run `bunx convex dev` for the first time.
-
-### Runtime Variables (Convex Cloud)
-
-These are used by your Convex functions and **must be set on the deployment**.
-
-**Pre-configured variables** (already set, don't overwrite):
+**Convex deployment** — already configured:
 - `AUTH_PRIVATE_KEY` — For Convex Auth JWT signing
 - `SITE_URL` — Your app's URL for auth redirects
 - `VIKTOR_SPACES_*` — Email sending configuration
 
-**Adding your own variables**:
+### Adding New Variables
+
+When integrating a new service (e.g., OpenAI, Stripe):
 
 ```bash
-# Example: Add OpenAI integration
+# Set on Convex deployment (takes effect immediately)
 bunx convex env set OPENAI_API_KEY "sk-..."
-
-# Example: Add Stripe
 bunx convex env set STRIPE_SECRET_KEY "sk_live_..."
-
-# Example: Add a feature flag
-bunx convex env set ENABLE_BETA_FEATURES "true"
 ```
 
-**Note**: Runtime vars are NOT read from `.env.local` — they must be set via CLI or dashboard.
+Then use in your Convex functions:
+
+```ts
+const apiKey = process.env.OPENAI_API_KEY;
+```
+
+**Note**: Runtime vars must be set via CLI — they are NOT read from `.env.local`.
 
 ### CLI Commands
 
@@ -268,11 +259,17 @@ export default http;
 
 ## Deployment
 
+Your app is automatically deployed when you use the deploy tool. To manually build:
+
 ```bash
+# Build frontend
 bun run build
+
+# Deploy Convex backend
 bunx convex deploy
-# Deploy dist/ to Vercel, Netlify, etc.
 ```
+
+The `dist/` folder is deployed to your preview/production URL automatically.
 
 ## Path Aliases
 
