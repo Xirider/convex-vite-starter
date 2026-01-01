@@ -25,6 +25,9 @@ Thumbs.db
 # Logs
 *.log
 npm-debug.log*
+bun.lockb
 
-# Extracted projects for analysis
-.extracted_project/
+# Temp/test output
+tmp/
+test-results/
+playwright-report/

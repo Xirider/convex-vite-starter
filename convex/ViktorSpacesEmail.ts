@@ -1,5 +1,7 @@
 import { Email } from "@convex-dev/auth/providers/Email";
 
+declare const process: { env: Record<string, string | undefined> };
+
 /**
  * Custom email provider that sends verification emails via Viktor Spaces API.
  * This proxies email sending through the Viktor Spaces backend which:
@@ -11,7 +13,7 @@ export const ViktorSpacesEmail = Email({
   id: "viktor-spaces-email",
   maxAge: 60 * 15, // 15 minutes
 
-  async sendVerificationRequest({ identifier: email, token, expires }) {
+  async sendVerificationRequest({ identifier: email, token }) {
     const apiUrl = process.env.VIKTOR_SPACES_API_URL;
     const projectName = process.env.VIKTOR_SPACES_PROJECT_NAME;
     const projectSecret = process.env.VIKTOR_SPACES_PROJECT_SECRET;
@@ -53,7 +55,7 @@ export const ViktorSpacesEmail = Email({
       throw new Error(`Failed to send verification email: ${error}`);
     }
 
-    const result = await response.json();
+    const result = (await response.json()) as { success: boolean; error?: string };
     if (!result.success) {
       throw new Error(`Email sending failed: ${result.error}`);
     }

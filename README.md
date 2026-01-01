@@ -28,13 +28,14 @@ bun run dev
 
 ## Scripts
 
-| Command          | Description           |
-| ---------------- | --------------------- |
-| `bun run dev`    | Start Vite dev server |
-| `bun run build`  | Build for production  |
-| `bun run check`  | TypeScript type check |
-| `bun run format` | Format with Prettier  |
-| `bun run lint`   | Lint with ESLint      |
+| Command              | Description                    |
+| -------------------- | ------------------------------ |
+| `bun run dev`        | Start Vite dev server          |
+| `bun run build`      | Build for production           |
+| `bun run check`      | TypeScript type check          |
+| `bun run format`     | Format with Prettier           |
+| `bun run lint`       | Lint with ESLint               |
+| `bun run screenshot` | Take screenshot of running app |
 
 ## Project Structure
 
