@@ -127,3 +127,147 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/contexts/ThemeContext";
 ```
+
+## Convex Cheatsheet
+
+Quick reference for common gotchas.
+
+### Function Syntax
+
+**Always include `returns` validator** (use `v.null()` for void functions):
+
+```ts
+import { query, mutation } from "./_generated/server";
+import { v } from "convex/values";
+
+export const getUser = query({
+  args: { id: v.id("users") },
+  returns: v.union(v.object({ name: v.string() }), v.null()),
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
+  },
+});
+
+export const deleteUser = mutation({
+  args: { id: v.id("users") },
+  returns: v.null(), // Required even when returning nothing
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.id);
+    return null;
+  },
+});
+```
+
+### Public vs Internal Functions
+
+```ts
+// Public (exposed to clients)
+import { query, mutation, action } from "./_generated/server";
+
+// Internal (only callable from other Convex functions)
+import { internalQuery, internalMutation, internalAction } from "./_generated/server";
+```
+
+### Calling Functions
+
+```ts
+import { api, internal } from "./_generated/api";
+
+// From mutation/action:
+await ctx.runQuery(api.users.get, { id });        // public query
+await ctx.runQuery(internal.users.getInternal, { id }); // internal query
+await ctx.runMutation(internal.users.update, { id, name });
+
+// Same-file calls need type annotation:
+const result: string = await ctx.runQuery(api.example.f, { name: "Bob" });
+```
+
+### Queries
+
+```ts
+// ❌ Don't use filter()
+const users = await ctx.db.query("users").filter(q => q.eq(q.field("email"), email));
+
+// ✅ Use withIndex() (define index in schema first)
+const users = await ctx.db.query("users").withIndex("by_email", q => q.eq("email", email));
+
+// ❌ No .delete() on queries
+await ctx.db.query("users").delete();
+
+// ✅ Collect and delete individually
+const users = await ctx.db.query("users").collect();
+for (const user of users) {
+  await ctx.db.delete(user._id);
+}
+
+// Get single document
+const user = await ctx.db.query("users").withIndex("by_email", q => q.eq("email", email)).unique();
+```
+
+### Schema
+
+```ts
+// convex/schema.ts
+import { defineSchema, defineTable } from "convex/server";
+import { v } from "convex/values";
+
+export default defineSchema({
+  users: defineTable({
+    email: v.string(),
+    name: v.string(),
+    role: v.union(v.literal("admin"), v.literal("user")),
+  })
+    .index("by_email", ["email"])           // Name = "by_" + field names
+    .index("by_role_and_name", ["role", "name"]), // Multi-field index
+});
+```
+
+### Actions
+
+```ts
+// Actions can't access ctx.db directly
+export const sendEmail = internalAction({
+  args: { userId: v.id("users"), message: v.string() },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    // ❌ ctx.db.get(args.userId) - doesn't work in actions
+    
+    // ✅ Call a query to get data
+    const user = await ctx.runQuery(internal.users.get, { id: args.userId });
+    
+    await fetch("https://api.email.com/send", { ... });
+    return null;
+  },
+});
+```
+
+### Types
+
+```ts
+import { Id, Doc } from "./_generated/dataModel";
+
+// Typed IDs
+function getUser(userId: Id<"users">) { ... }
+
+// Full document type
+function formatUser(user: Doc<"users">) { ... }
+
+// Record with ID keys
+const cache: Record<Id<"users">, string> = {};
+```
+
+### Validators Reference
+
+| Type | Validator | Example |
+|------|-----------|---------|
+| String | `v.string()` | `"hello"` |
+| Number | `v.number()` | `42`, `3.14` |
+| Boolean | `v.boolean()` | `true` |
+| Null | `v.null()` | `null` |
+| ID | `v.id("tableName")` | `"jh7..."` |
+| Array | `v.array(v.string())` | `["a", "b"]` |
+| Object | `v.object({ name: v.string() })` | `{ name: "Jo" }` |
+| Optional | `v.optional(v.string())` | `undefined` or `"hi"` |
+| Union | `v.union(v.string(), v.null())` | `"hi"` or `null` |
+| Literal | `v.literal("admin")` | `"admin"` |
+| Record | `v.record(v.string(), v.number())` | `{ a: 1, b: 2 }` |
