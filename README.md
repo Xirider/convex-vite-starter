@@ -110,6 +110,102 @@ toast.error("Something went wrong");
 
 App-level `ErrorBoundary` catches errors gracefully.
 
+## Environment Variables
+
+Create a `.env.local` file (gitignored) with:
+
+```bash
+# Required - Convex
+CONVEX_DEPLOYMENT=dev:your-deployment-name
+VITE_CONVEX_URL=https://your-deployment.convex.cloud
+
+# Required for Auth - generate with: npx @convex-dev/auth
+AUTH_PRIVATE_KEY="-----BEGIN EC PRIVATE KEY-----..."
+
+# Required for Email Sending (Viktor Spaces)
+VIKTOR_SPACES_API_URL=https://your-viktor-spaces-instance.com
+VIKTOR_SPACES_PROJECT_NAME=your-project-name
+VIKTOR_SPACES_PROJECT_SECRET=your-secret-key
+```
+
+Set production env vars in Convex dashboard: `bunx convex dashboard` → Settings → Environment Variables.
+
+## Auth Flows
+
+This starter includes complete email/password authentication with OTP verification.
+
+### Sign Up Flow
+
+```
+1. User enters name + email + password
+2. Clicks "Sign Up" → OTP code sent to email
+3. User enters 6-digit code
+4. Account created + signed in
+```
+
+### Sign In Flow
+
+```
+1. User enters email + password
+2. Clicks "Sign In" → Authenticated
+```
+
+### Password Reset Flow
+
+```
+1. Click "Forgot password?"
+2. Enter email → Reset code sent
+3. Enter code → Set new password
+4. Signed in with new password
+```
+
+### Customizing Auth
+
+Email templates are in `convex/ViktorSpacesEmail.ts`. Modify:
+- `subject` — Email subject line
+- `heading` / `description` — Email body text
+- `maxAge` — OTP expiration (default: 15 minutes)
+
+## HTTP Endpoints
+
+Create API routes in `convex/http.ts`:
+
+```ts
+import { httpRouter } from "convex/server";
+import { httpAction } from "./_generated/server";
+
+const http = httpRouter();
+
+// Webhook endpoint
+http.route({
+  path: "/webhooks/stripe",
+  method: "POST",
+  handler: httpAction(async (ctx, req) => {
+    const body = await req.json();
+    
+    // Call a mutation to process the webhook
+    await ctx.runMutation(internal.payments.handleWebhook, { 
+      event: body 
+    });
+    
+    return new Response("OK", { status: 200 });
+  }),
+});
+
+// Public API endpoint
+http.route({
+  path: "/api/health",
+  method: "GET",
+  handler: httpAction(async () => {
+    return Response.json({ status: "ok" });
+  }),
+});
+
+export default http;
+```
+
+**Note**: Paths are exact (no wildcards). Endpoint URL: `https://your-deployment.convex.site/webhooks/stripe`
+
 ## Deployment
 
 ```bash
