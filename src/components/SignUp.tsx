@@ -1,76 +1,142 @@
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useState } from "react";
 import { Button } from "./ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 
+type Step = "signUp" | { email: string };
+
 export function SignUp() {
   const { signIn } = useAuthActions();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [step, setStep] = useState<Step>("signUp");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
+  if (step === "signUp") {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Create Account</CardTitle>
+          <CardDescription>Enter your details to get started</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form
+            onSubmit={async e => {
+              e.preventDefault();
+              setError("");
+              setLoading(true);
 
-    try {
-      await signIn("password", { name, email, password, flow: "signUp" });
-    } catch {
-      setError("Could not create account. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+              const formData = new FormData(e.currentTarget);
+              try {
+                await signIn("password", formData);
+                setStep({ email: formData.get("email") as string });
+              } catch {
+                setError("Could not create account. Please try again.");
+              } finally {
+                setLoading(false);
+              }
+            }}
+            className="space-y-4"
+          >
+            <div className="space-y-2">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                name="name"
+                type="text"
+                placeholder="Your name"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="you@example.com"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                placeholder="••••••••"
+                minLength={6}
+                required
+              />
+            </div>
+            <input name="flow" value="signUp" type="hidden" />
+            {error && <p className="text-sm text-destructive">{error}</p>}
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Creating account..." : "Sign Up"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Create Account</CardTitle>
+        <CardTitle>Verify your email</CardTitle>
+        <CardDescription>
+          We sent a verification code to {step.email}
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form
+          onSubmit={async e => {
+            e.preventDefault();
+            setError("");
+            setLoading(true);
+
+            const formData = new FormData(e.currentTarget);
+            try {
+              await signIn("password", formData);
+            } catch {
+              setError("Invalid or expired code. Please try again.");
+            } finally {
+              setLoading(false);
+            }
+          }}
+          className="space-y-4"
+        >
           <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="code">Verification Code</Label>
             <Input
-              id="name"
+              id="code"
+              name="code"
               type="text"
-              value={name}
-              onChange={e => setName(e.target.value)}
-              placeholder="Your name"
+              placeholder="Enter 6-digit code"
+              autoComplete="one-time-code"
               required
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              placeholder="••••••••"
-              minLength={6}
-              required
-            />
-          </div>
+          <input name="flow" value="email-verification" type="hidden" />
+          <input name="email" value={step.email} type="hidden" />
           {error && <p className="text-sm text-destructive">{error}</p>}
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Creating account..." : "Sign Up"}
+            {loading ? "Verifying..." : "Verify Email"}
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            className="w-full"
+            onClick={() => setStep("signUp")}
+          >
+            Back to sign up
           </Button>
         </form>
       </CardContent>
