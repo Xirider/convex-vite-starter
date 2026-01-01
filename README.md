@@ -28,18 +28,39 @@ bunx convex dev
 bun run dev
 ```
 
+### For Agents / CI (No Background Terminals)
+
+If you can't run background processes, use these one-shot commands:
+
+```bash
+# Push Convex functions once (no watching)
+bun run sync
+
+# Push Convex + build frontend in one command
+bun run sync:build
+
+# Fetch recent backend logs (exits after 5s)
+bun run logs:fetch
+```
+
+The `sync` command uses `convex dev --once` which pushes your functions and exits immediately. Use `bun run logs:fetch` to get recent backend logs (console.log, errors, function executions) — it fetches logs and exits after 5 seconds.
+
 ## Scripts
 
-| Command              | Description                     |
-| -------------------- | ------------------------------- |
-| `bun run dev`        | Start Vite dev server           |
-| `bun run build`      | Build for production            |
-| `bun run check`      | Lint + format check with Biome  |
-| `bun run format`     | Format & fix with Biome         |
-| `bun run lint`       | Lint only with Biome            |
-| `bun run screenshot` | Take screenshot of running app  |
-| `bun run test:auth`  | Set up test user authentication |
-| `bun run test:demo`  | Run demo test with test user    |
+| Command              | Description                                 |
+| -------------------- | ------------------------------------------- |
+| `bun run dev`        | Start Vite dev server                       |
+| `bun run build`      | Build for production                        |
+| `bun run sync`       | Push Convex functions once (no watching)    |
+| `bun run sync:build` | Push Convex + build frontend in one command |
+| `bun run logs`       | Tail Convex backend logs (streaming)        |
+| `bun run logs:fetch` | Fetch recent logs and exit (agent-friendly) |
+| `bun run check`      | Lint + format check with Biome              |
+| `bun run format`     | Format & fix with Biome                     |
+| `bun run lint`       | Lint only with Biome                        |
+| `bun run screenshot` | Take screenshot of running app              |
+| `bun run test:auth`  | Set up test user authentication             |
+| `bun run test:demo`  | Run demo test with test user                |
 
 ## Project Structure
 

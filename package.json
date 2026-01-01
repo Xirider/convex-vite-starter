@@ -10,6 +10,10 @@
     "check": "biome check .",
     "format": "biome check --write .",
     "lint": "biome lint .",
+    "sync": "bunx convex dev --once",
+    "sync:build": "bunx convex dev --once && bun run build",
+    "logs": "bunx convex logs",
+    "logs:fetch": "npx tsx scripts/logs.ts",
     "test:auth": "npx tsx scripts/auth.ts",
     "test:demo": "npx tsx scripts/demo-test.ts",
     "screenshot": "npx tsx scripts/screenshot.ts"
