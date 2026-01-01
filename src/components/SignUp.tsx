@@ -51,9 +51,9 @@ export function SignUp() {
                 setLoading(false);
               }
             }}
-            className="space-y-4"
+            className="flex flex-col gap-4"
           >
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="name">Name</Label>
               <Input
                 id="name"
@@ -63,7 +63,7 @@ export function SignUp() {
                 required
               />
             </div>
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
@@ -73,7 +73,7 @@ export function SignUp() {
                 required
               />
             </div>
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
@@ -119,9 +119,9 @@ export function SignUp() {
               setLoading(false);
             }
           }}
-          className="space-y-4"
+          className="flex flex-col gap-4"
         >
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <Label htmlFor="code">Verification Code</Label>
             <Input
               id="code"
