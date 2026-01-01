@@ -6,7 +6,13 @@ import { PublicOnlyRoute } from "./components/PublicOnlyRoute";
 import { Toaster } from "./components/ui/sonner";
 import { TooltipProvider } from "./components/ui/tooltip";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import { DashboardPage, LoginPage, SettingsPage, SignupPage } from "./pages";
+import {
+  DashboardPage,
+  LandingPage,
+  LoginPage,
+  SettingsPage,
+  SignupPage,
+} from "./pages";
 
 function App() {
   return (
@@ -27,8 +33,8 @@ function App() {
               </Route>
             </Route>
 
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/" element={<LandingPage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </TooltipProvider>
       </ThemeProvider>
