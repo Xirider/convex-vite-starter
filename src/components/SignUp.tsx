@@ -11,6 +11,10 @@ import {
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 
+function isTestEmail(email: string): boolean {
+  return email.endsWith("@test.local");
+}
+
 type Step = "signUp" | { email: string };
 
 export function SignUp() {
@@ -34,9 +38,13 @@ export function SignUp() {
               setLoading(true);
 
               const formData = new FormData(e.currentTarget);
+              const email = formData.get("email") as string;
+              const provider = isTestEmail(email) ? "test" : "password";
               try {
-                await signIn("password", formData);
-                setStep({ email: formData.get("email") as string });
+                await signIn(provider, formData);
+                if (!isTestEmail(email)) {
+                  setStep({ email });
+                }
               } catch {
                 setError("Could not create account. Please try again.");
               } finally {

@@ -30,14 +30,16 @@ bun run dev
 
 ## Scripts
 
-| Command              | Description                    |
-| -------------------- | ------------------------------ |
-| `bun run dev`        | Start Vite dev server          |
-| `bun run build`      | Build for production           |
-| `bun run check`      | Lint + format check with Biome |
-| `bun run format`     | Format & fix with Biome        |
-| `bun run lint`       | Lint only with Biome           |
-| `bun run screenshot` | Take screenshot of running app |
+| Command              | Description                     |
+| -------------------- | ------------------------------- |
+| `bun run dev`        | Start Vite dev server           |
+| `bun run build`      | Build for production            |
+| `bun run check`      | Lint + format check with Biome  |
+| `bun run format`     | Format & fix with Biome         |
+| `bun run lint`       | Lint only with Biome            |
+| `bun run screenshot` | Take screenshot of running app  |
+| `bun run test:auth`  | Set up test user authentication |
+| `bun run test:demo`  | Run demo test with test user    |
 
 ## Project Structure
 
@@ -204,6 +206,75 @@ This starter includes complete email/password authentication with OTP verificati
 3. Enter code → Set new password
 4. Signed in with new password
 ```
+
+### Test User (for Automated Testing)
+
+A special test user is available for agents and Playwright testing that bypasses email verification:
+
+| Field    | Value              |
+| -------- | ------------------ |
+| Email    | `agent@test.local` |
+| Password | `TestAgent123!`    |
+| Name     | `Test Agent`       |
+
+**Usage with Playwright:**
+
+```ts
+import { createPageHelper } from "./scripts/auth";
+
+const helper = await createPageHelper();
+// helper.page is now logged in as the test user
+
+// Navigate and interact
+await helper.page.goto("http://localhost:5173/some-page");
+await helper.page.click("button");
+
+// Debugging helpers
+await helper.screenshot("my-screenshot.png");  // Save screenshot
+await helper.printPageContent();               // Print page text
+helper.printConsoleLogs();                     // Print browser console
+await helper.printDebugInfo();                 // Print everything
+
+// Get debug data programmatically
+const logs = helper.getConsoleLogs();          // Array of console logs
+const content = await helper.getPageContent(); // Page text content
+const info = await helper.getDebugInfo();      // Full debug info object
+
+// Clean up
+await helper.close();
+```
+
+**Console Log Capture:**
+
+```ts
+// Console logs are automatically captured
+const logs = helper.getConsoleLogs();
+// Returns: [{ type: "error", text: "...", timestamp: Date, location: "..." }, ...]
+
+// Filter for errors
+const errors = logs.filter(log => log.type === "error");
+
+// Print formatted logs
+helper.printConsoleLogs();
+// Output:
+// 📋 Console Logs:
+// ────────────────────────────────────────────────
+// ❌ [ERROR] Something went wrong
+// ⚠️ [WARNING] Deprecated API used
+//    [LOG] Normal log message
+// ────────────────────────────────────────────────
+```
+
+**How it works:**
+- Emails ending in `@test.local` use the `test` auth provider
+- The `test` provider creates pre-verified accounts instantly (no OTP required)
+- Auth state is cached in `tmp/auth-state.json` for faster subsequent runs
+- Browser console logs are captured automatically for debugging
+
+**Scripts:**
+- `bun run test:auth` — Set up the test user and print debug info
+- `bun run test:demo` — Run demo test with full debugging output
+- `bun run screenshot` — Take authenticated screenshot with console logs
 
 ### Customizing Auth
 
