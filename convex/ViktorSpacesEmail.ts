@@ -2,6 +2,12 @@ import { Email } from "@convex-dev/auth/providers/Email";
 
 declare const process: { env: Record<string, string | undefined> };
 
+function generateOTP() {
+  const array = new Uint32Array(1);
+  crypto.getRandomValues(array);
+  return String(array[0] % 1000000).padStart(6, "0");
+}
+
 async function sendEmail({
   email,
   token,
@@ -41,7 +47,7 @@ async function sendEmail({
           <h2 style="color: #333;">${heading}</h2>
           <p style="color: #666;">${description}</p>
           <div style="background: #f5f5f5; padding: 20px; text-align: center; border-radius: 8px; margin: 20px 0;">
-            <span style="font-size: 32px; font-weight: bold; letter-spacing: 4px; color: #333;">${token}</span>
+            <span style="font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #333;">${token}</span>
           </div>
           <p style="color: #999; font-size: 12px;">This code expires in 15 minutes.</p>
         </div>
@@ -76,6 +82,10 @@ export const ViktorSpacesEmail = Email({
   id: "viktor-spaces-email",
   maxAge: 60 * 15, // 15 minutes
 
+  async generateVerificationToken() {
+    return generateOTP();
+  },
+
   async sendVerificationRequest({ identifier: email, token }) {
     await sendEmail({
       email,
@@ -94,6 +104,10 @@ export const ViktorSpacesEmail = Email({
 export const ViktorSpacesPasswordReset = Email({
   id: "viktor-spaces-password-reset",
   maxAge: 60 * 15, // 15 minutes
+
+  async generateVerificationToken() {
+    return generateOTP();
+  },
 
   async sendVerificationRequest({ identifier: email, token }) {
     await sendEmail({
