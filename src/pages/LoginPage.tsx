@@ -4,9 +4,8 @@ import { Button } from "@/components/ui/button";
 
 export function LoginPage() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4">
+    <div className="flex-1 flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <h1 className="text-3xl font-bold text-center mb-8">Welcome</h1>
         <SignIn />
         <p className="text-center mt-4 text-muted-foreground">
           Don't have an account?{" "}

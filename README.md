@@ -95,16 +95,73 @@ grep VITE_CONVEX_URL .env.local
 │   └── schema.ts        # Database schema
 ├── src/
 │   ├── components/
-│   │   └── ui/          # 53 shadcn components
+│   │   ├── ui/          # 53 shadcn components
+│   │   ├── Header.tsx   # Shared header (adapts to auth state)
+│   │   ├── Layout.tsx   # Authenticated pages layout
+│   │   ├── PublicLayout.tsx  # Public pages layout (landing, login, signup)
+│   │   ├── SignIn.tsx   # Sign in form
+│   │   └── SignUp.tsx   # Sign up form
+│   ├── pages/           # Page components
 │   ├── contexts/        # ThemeContext
 │   ├── hooks/           # useIsMobile, etc.
 │   ├── lib/             # cn() utility
-│   ├── App.tsx          # Main app with providers
-│   └── index.css        # Tailwind theme
+│   ├── App.tsx          # Main app with routes & providers
+│   └── index.css        # Tailwind theme (CSS variables)
 ├── biome.json           # Biome config (linting + formatting)
 ├── components.json      # shadcn CLI config
 └── package.json
 ```
+
+## Customizing This Starter
+
+This template is designed to be easily customized. Here's how to make it your own:
+
+### 1. Adjust the Design (CSS Variables)
+
+All colors, spacing, and visual tokens are defined in `src/index.css`. Change these to match your brand:
+
+```css
+:root {
+  --primary: var(--color-blue-700);      /* Main action color */
+  --primary-foreground: var(--color-blue-50);
+  --background: oklch(1 0 0);            /* Page background */
+  --foreground: oklch(0.235 0.015 65);   /* Text color */
+  --card: oklch(1 0 0);                  /* Card backgrounds */
+  --radius: 0.65rem;                     /* Border radius */
+  /* ... other tokens */
+}
+```
+
+Changes here automatically apply to all pages and components.
+
+### 2. Customize Shared Layouts
+
+The project uses shared layout components for consistency:
+
+| Component      | Purpose                                              | Location                          |
+| -------------- | ---------------------------------------------------- | --------------------------------- |
+| `Header`       | Shared navigation header (adapts to auth state)      | `src/components/Header.tsx`       |
+| `PublicLayout` | Layout for public pages (landing, login, signup)     | `src/components/PublicLayout.tsx` |
+| `Layout`       | Layout for authenticated pages (dashboard, settings) | `src/components/Layout.tsx`       |
+
+**To change the app name, header, or footer** — edit these shared components once and all pages update.
+
+### 3. Remove Unused Pages
+
+Delete pages you don't need from `src/pages/` and remove their routes from `src/App.tsx`:
+
+```tsx
+// src/App.tsx — remove routes you don't need
+<Route path="/settings" element={<SettingsPage />} />
+```
+
+### 4. Design Your Pages
+
+Each page in `src/pages/` uses the shared UI components from `src/components/ui/`. Design them using:
+
+- **shadcn/ui components** — Button, Card, Input, etc. from `@/components/ui/*`
+- **Tailwind utilities** — for layout and custom styling
+- **CSS variables** — colors automatically match your theme
 
 ## Features
 
