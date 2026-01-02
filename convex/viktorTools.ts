@@ -1,5 +1,5 @@
-import { action } from "./_generated/server";
 import { v } from "convex/values";
+import { action } from "./_generated/server";
 
 declare const process: { env: Record<string, string | undefined> };
 
@@ -25,21 +25,27 @@ export interface ToolGatewayResult {
  */
 export async function callToolGateway(
   role: string,
-  args: Record<string, unknown> = {}
+  args: Record<string, unknown> = {},
 ): Promise<ToolGatewayResult> {
-  const response = await fetch(`${VIKTOR_API_URL}/api/viktor-spaces/tools/call`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      project_name: PROJECT_NAME,
-      project_secret: PROJECT_SECRET,
-      role,
-      arguments: args,
-    }),
-  });
+  const response = await fetch(
+    `${VIKTOR_API_URL}/api/viktor-spaces/tools/call`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        project_name: PROJECT_NAME,
+        project_secret: PROJECT_SECRET,
+        role,
+        arguments: args,
+      }),
+    },
+  );
 
   if (!response.ok) {
-    return { success: false, error: `HTTP ${response.status}: ${await response.text()}` };
+    return {
+      success: false,
+      error: `HTTP ${response.status}: ${await response.text()}`,
+    };
   }
 
   return await response.json();

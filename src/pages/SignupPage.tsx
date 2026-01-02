@@ -1,6 +1,6 @@
+import { Link } from "react-router-dom";
 import { SignUp } from "@/components/SignUp";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
 
 export function SignupPage() {
   return (

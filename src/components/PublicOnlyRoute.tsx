@@ -1,6 +1,5 @@
 import { useConvexAuth } from "convex/react";
 import { Navigate, Outlet } from "react-router-dom";
-import { Skeleton } from "./ui/skeleton";
 import {
   Card,
   CardContent,
@@ -8,6 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
+import { Skeleton } from "./ui/skeleton";
 
 function AuthFormSkeleton() {
   return (

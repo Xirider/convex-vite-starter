@@ -151,6 +151,20 @@ toast.error("Something went wrong");
 
 App-level `ErrorBoundary` catches errors gracefully.
 
+### 🛠️ Utility Hooks
+
+| Hook                      | Purpose                                                                                                                                               |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `useIsMobile()`           | Returns `true` when viewport < 768px. Reactive to window resize.                                                                                      |
+| `usePersistFn(fn)`        | Returns a stable function reference that always calls the latest `fn`. Like `useCallback` but never stale.                                            |
+| `useComposition(options)` | Handles IME composition for CJK language input. Blocks Enter/Escape during character composition to prevent accidental form submits or dialog closes. |
+
+```tsx
+import { useIsMobile } from "@/hooks/useMobile";
+import { usePersistFn } from "@/hooks/usePersistFn";
+import { useComposition } from "@/hooks/useComposition";
+```
+
 ## Environment Variables
 
 Your project comes **pre-configured** with all required environment variables. You only need to add new ones when integrating additional services.
@@ -320,6 +334,27 @@ Email templates are in `convex/ViktorSpacesEmail.ts`. Modify:
 - `subject` — Email subject line
 - `heading` / `description` — Email body text
 - `maxAge` — OTP expiration (default: 15 minutes)
+
+### Internal Apps (Domain Restriction)
+
+If an internal app is requestted, a good way to approach this is to restrict signups to specific email domains (e.g., only `@yourcompany.com`), modify `convex/ViktorSpacesEmail.ts`:
+
+```ts
+const ALLOWED_DOMAINS = ["yourcompany.com", "subsidiary.io"];
+
+export const ViktorSpacesEmail: EmailConfig = {
+  async sendVerificationRequest({ identifier: email }) {
+    const domain = email.split("@")[1];
+    if (!ALLOWED_DOMAINS.includes(domain)) {
+      throw new Error("Only company email addresses are allowed");
+    }
+    // ... rest of the email sending logic
+  },
+  // ...
+};
+```
+
+This check runs before the OTP email is sent, so unauthorized domains are rejected immediately during signup.
 
 ## HTTP Endpoints
 
