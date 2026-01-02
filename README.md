@@ -344,6 +344,43 @@ export default http;
 
 **Note**: Paths are exact (no wildcards). Endpoint URL: `https://your-deployment.convex.site/webhooks/stripe`
 
+## Viktor Tools Integration
+
+This template includes `convex/viktorTools.ts` which lets your app call Viktor's SDK functions (AI search, image generation, etc.) from Convex actions.
+
+### Using the Included Search Action
+
+```tsx
+import { useAction } from "convex/react";
+import { api } from "../convex/_generated/api";
+
+function SearchComponent() {
+  const search = useAction(api.viktorTools.quickAiSearch);
+
+  const handleSearch = async () => {
+    const result = await search({ query: "What is the capital of France?" });
+    if (result.success) {
+      console.log(result.result);
+    }
+  };
+}
+```
+
+### Adding More Tools
+
+Any SDK function can be called via the `callToolGateway` helper. Add new actions to `convex/viktorTools.ts`:
+
+```ts
+export const generateImage = action({
+  args: { prompt: v.string() },
+  handler: async (_ctx, { prompt }) => {
+    return await callToolGateway("text2im", { prompt, aspect_ratio: "1:1" });
+  },
+});
+```
+
+The `role` is the SDK tool's identifier, and `arguments` are passed directly to the tool.
+
 ## Deployment
 
 Your app is automatically deployed when you use the deploy tool. To manually build:
