@@ -1,18 +1,21 @@
-import { existsSync } from "fs";
-import { mkdir } from "fs/promises";
-import { join } from "path";
-import type { Browser, BrowserContext, ConsoleMessage, Page } from "playwright";
+import { existsSync } from "node:fs";
+import { mkdir } from "node:fs/promises";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+import type {
+  Browser,
+  BrowserContext,
+  ConsoleMessage,
+  Page,
+} from "playwright";
 import { chromium } from "playwright";
 import { TEST_USER } from "./testUser";
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
 const APP_URL = process.env.APP_URL || "http://localhost:5173";
-const AUTH_STATE_PATH = join(
-  import.meta.dirname,
-  "..",
-  "tmp",
-  "auth-state.json",
-);
-const TMP_DIR = join(import.meta.dirname, "..", "tmp");
+const AUTH_STATE_PATH = join(__dirname, "..", "tmp", "auth-state.json");
+const TMP_DIR = join(__dirname, "..", "tmp");
 
 export interface ConsoleLog {
   type: string;

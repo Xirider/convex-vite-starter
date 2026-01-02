@@ -39,10 +39,10 @@ Your project is already set up. To start developing:
 
 ```bash
 # Start Convex backend (watches for changes)
-bunx convex dev
+npx convex dev
 
 # In another terminal, start frontend
-bun run dev
+npm run dev
 ```
 
 ### For Agents / CI (No Background Terminals)
@@ -51,33 +51,52 @@ If you can't run background processes, use these one-shot commands:
 
 ```bash
 # Push Convex functions once (no watching)
-bun run sync
+npm run sync
 
 # Push Convex + build frontend in one command
-bun run sync:build
+npm run sync:build
 
 # Fetch recent backend logs afterwards (exits after 5s)
-bun run logs:fetch
+npm run logs:fetch
 ```
 
-The `sync` command uses `convex dev --once` which pushes your functions and exits immediately. Use `bun run logs:fetch` to get recent backend logs (console.log, errors, function executions) — it fetches logs and exits after 5 seconds.
+The `sync` command uses `convex dev --once` which pushes your functions and exits immediately. Use `npm run logs:fetch` to get recent backend logs (console.log, errors, function executions) — it fetches logs and exits after 5 seconds.
+
+### Agent/Sandbox Environment Notes
+
+If you're running in a sandboxed environment:
+
+1. **PATH issues**: If `bun` or `npm` are not found, set PATH explicitly:
+   ```bash
+   export PATH="$HOME/.bun/bin:$HOME/.local/bin:$PATH"
+   ```
+
+2. **WebSocket errors with `convex env`**: If you see WebSocket connection errors, read `.env.local` directly as a fallback:
+   ```bash
+   grep VITE_CONVEX_URL .env.local
+   ```
+
+3. **Playwright issues**: Ensure Playwright browsers are installed:
+   ```bash
+   npx playwright install chromium
+   ```
 
 ## Scripts
 
 | Command              | Description                                 |
 | -------------------- | ------------------------------------------- |
-| `bun run dev`        | Start Vite dev server                       |
-| `bun run build`      | Build for production                        |
-| `bun run sync`       | Push Convex functions once (no watching)    |
-| `bun run sync:build` | Push Convex + build frontend in one command |
-| `bun run logs`       | Tail Convex backend logs (streaming)        |
-| `bun run logs:fetch` | Fetch recent logs and exit (agent-friendly) |
-| `bun run check`      | Lint + format check with Biome              |
-| `bun run format`     | Format & fix with Biome                     |
-| `bun run lint`       | Lint only with Biome                        |
-| `bun run screenshot` | Take screenshot of running app              |
-| `bun run test:auth`  | Set up test user authentication             |
-| `bun run test:demo`  | Run demo test with test user                |
+| `npm run dev`        | Start Vite dev server                       |
+| `npm run build`      | Build for production                        |
+| `npm run sync`       | Push Convex functions once (no watching)    |
+| `npm run sync:build` | Push Convex + build frontend in one command |
+| `npm run logs`       | Tail Convex backend logs (streaming)        |
+| `npm run logs:fetch` | Fetch recent logs and exit (agent-friendly) |
+| `npm run check`      | Lint + format check with Biome              |
+| `npm run format`     | Format & fix with Biome                     |
+| `npm run lint`       | Lint only with Biome                        |
+| `npm run screenshot` | Take screenshot of running app              |
+| `npm run test:auth`  | Set up test user authentication             |
+| `npm run test:demo`  | Run demo test with test user                |
 
 ## Project Structure
 
@@ -124,7 +143,7 @@ Customize colors in `src/index.css`:
 53 pre-installed shadcn/ui components. Add more with:
 
 ```bash
-bunx shadcn@latest add [component-name]
+npx shadcn@latest add [component-name]
 ```
 
 ### 📱 Responsive
@@ -186,8 +205,8 @@ When integrating a new service (e.g., OpenAI, Stripe):
 
 ```bash
 # Set on Convex deployment (takes effect immediately)
-bunx convex env set OPENAI_API_KEY "sk-..."
-bunx convex env set STRIPE_SECRET_KEY "sk_live_..."
+npx convex env set OPENAI_API_KEY "sk-..."
+npx convex env set STRIPE_SECRET_KEY "sk_live_..."
 ```
 
 Then use in your Convex functions:
@@ -202,16 +221,16 @@ const apiKey = process.env.OPENAI_API_KEY;
 
 ```bash
 # List all env vars on deployment
-bunx convex env list
+npx convex env list
 
 # Set a variable (takes effect immediately, no redeploy needed)
-bunx convex env set API_KEY "your-api-key"
+npx convex env set API_KEY "your-api-key"
 
 # Get a specific variable
-bunx convex env get API_KEY
+npx convex env get API_KEY
 
 # Remove a variable
-bunx convex env remove API_KEY
+npx convex env remove API_KEY
 ```
 
 ### Adding New Integrations
@@ -220,7 +239,7 @@ When your code needs a new API key:
 
 1. **Set on Convex deployment** (takes effect immediately):
    ```bash
-   bunx convex env set OPENAI_API_KEY "sk-..."
+   npx convex env set OPENAI_API_KEY "sk-..."
    ```
 
 2. **Use in your Convex functions**:
@@ -324,9 +343,9 @@ helper.printConsoleLogs();
 - Browser console logs are captured automatically for debugging
 
 **Scripts:**
-- `bun run test:auth` — Set up the test user and print debug info
-- `bun run test:demo` — Run demo test with full debugging output
-- `bun run screenshot` — Take authenticated screenshot with console logs
+- `npm run test:auth` — Set up the test user and print debug info
+- `npm run test:demo` — Run demo test with full debugging output
+- `npm run screenshot` — Take authenticated screenshot with console logs
 
 ### Customizing Auth
 

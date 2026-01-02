@@ -9,6 +9,7 @@ const proc = spawn(
   {
     stdio: ["ignore", "pipe", "pipe"],
     cwd: process.cwd(),
+    shell: true,
   },
 );
 
@@ -28,7 +29,10 @@ proc.stdout.on("data", (data: Buffer) => {
 });
 
 proc.stderr.on("data", (data: Buffer) => {
-  process.stderr.write(data);
+  const text = data.toString();
+  if (!text.includes("WebSocket") && !text.includes("Attempting reconnect")) {
+    process.stderr.write(data);
+  }
 });
 
 setTimeout(() => {
@@ -39,7 +43,7 @@ setTimeout(() => {
   process.exit(0);
 }, TIMEOUT_MS);
 
-proc.on("error", err => {
+proc.on("error", (err) => {
   console.error("Failed to start convex logs:", err.message);
   process.exit(1);
 });
