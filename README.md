@@ -16,6 +16,23 @@ A production-ready full-stack web app template.
 - **TypeScript** — Full type safety
 - **Bun** — Fast package manager & runtime
 
+### Convex Platform Features
+
+- **Real-time Subscriptions** — Queries automatically update when data changes
+- **ACID Transactions** — Mutations are atomic and consistent
+- **File Storage** — Upload, store, and serve files with `ctx.storage`
+- **Full-Text Search** — Built-in text search with `searchIndex`
+- **Vector Search** — Semantic search for AI embeddings with `vectorIndex`
+- **Scheduled Functions** — Cron jobs and delayed execution with `ctx.scheduler`
+- **HTTP Endpoints** — REST APIs and webhooks via `httpRouter`
+- **Authentication** — Convex Auth with multiple providers
+- **TypeScript-First** — End-to-end type safety from DB to frontend
+- **Pagination** — Cursor-based pagination with `.paginate()`
+- **Indexes** — Secondary indexes for efficient queries
+- **Environment Variables** — Secure runtime configuration
+- **Function Logs** — Real-time logging and debugging
+- **Automatic Caching** — Query results cached and invalidated automatically
+
 ## Quick Start
 
 Your project is already set up. To start developing:
@@ -39,7 +56,7 @@ bun run sync
 # Push Convex + build frontend in one command
 bun run sync:build
 
-# Fetch recent backend logs (exits after 5s)
+# Fetch recent backend logs afterwards (exits after 5s)
 bun run logs:fetch
 ```
 
@@ -383,17 +400,7 @@ The `role` is the SDK tool's identifier, and `arguments` are passed directly to 
 
 ## Deployment
 
-Your app is automatically deployed when you use the deploy tool. To manually build:
-
-```bash
-# Build frontend
-bun run build
-
-# Deploy Convex backend
-bunx convex deploy
-```
-
-The `dist/` folder is deployed to your preview/production URL automatically.
+Your app is automatically built and deployed when you use the deploy tool.
 
 ## Path Aliases
 
