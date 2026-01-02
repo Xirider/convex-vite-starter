@@ -43,7 +43,7 @@ setTimeout(() => {
   process.exit(0);
 }, TIMEOUT_MS);
 
-proc.on("error", (err) => {
+proc.on("error", err => {
   console.error("Failed to start convex logs:", err.message);
   process.exit(1);
 });

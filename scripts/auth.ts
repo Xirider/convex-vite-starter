@@ -1,13 +1,8 @@
 import { existsSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
-import { join, dirname } from "node:path";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import type {
-  Browser,
-  BrowserContext,
-  ConsoleMessage,
-  Page,
-} from "playwright";
+import type { Browser, BrowserContext, ConsoleMessage, Page } from "playwright";
 import { chromium } from "playwright";
 import { TEST_USER } from "./testUser";
 

@@ -1,5 +1,5 @@
-import { existsSync, readFileSync } from "node:fs";
 import { spawn } from "node:child_process";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const envVarName = process.argv[2];
@@ -10,7 +10,7 @@ if (!envVarName) {
 }
 
 async function getFromConvex(varName: string): Promise<string | null> {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     const proc = spawn("npx", ["convex", "env", "get", varName], {
       stdio: ["ignore", "pipe", "pipe"],
       cwd: process.cwd(),
@@ -36,7 +36,7 @@ async function getFromConvex(varName: string): Promise<string | null> {
       resolve(null);
     }, 10000);
 
-    proc.on("close", (code) => {
+    proc.on("close", code => {
       clearTimeout(timeout);
       if (code === 0 && !hadError && stdout.trim()) {
         resolve(stdout.trim());
