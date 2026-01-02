@@ -433,6 +433,79 @@ export const generateImage = action({
 
 The `role` is the SDK tool's identifier, and `arguments` are passed directly to the tool.
 
+## 🎨 Design Guide
+
+### Design Principles
+
+When generating frontend UI, avoid generic patterns that lack visual distinction:
+
+- **Avoid generic full-page centered layouts** — prefer asymmetric/sidebar/grid structures for landing pages and dashboards
+- **Match navigation to app type** — use sidebar patterns for internal tools/dashboards, but design custom navigation (top nav, contextual nav) for public-facing apps (forums, communities, e-commerce)
+- **Make creative design decisions** — when requirements are vague, choose specific color palettes, typography, and layout approaches
+- **Prioritize visual diversity** — combine different design systems (e.g., one color scheme + different typography + another layout principle)
+- **Landing pages** — prefer asymmetric layouts, specific color values (not just "blue"), and textured backgrounds over flat colors
+- **Dashboards** — use defined spacing systems, soft shadows over borders, and accent colors for hierarchy
+
+### UI & Styling
+
+- **Use shadcn/ui components** for interactions to keep a modern, consistent look; import from `@/components/ui/*`
+- **Compose Tailwind utilities** with component variants for layout and states; avoid excessive custom CSS
+- **Preserve design tokens** — keep the `@layer base` rules in `src/index.css`. Utilities like `border-border` and `font-sans` depend on them
+- **Consistent design language** — use spacing, radius, shadows, and typography via tokens. Extract shared UI into `components/` for reuse
+- **Accessibility and responsiveness** — keep visible focus rings and ensure keyboard reachability; design mobile-first with thoughtful breakpoints
+- **Theming** — choose dark/light theme in `ThemeProvider`, then manage color palette with CSS variables in `src/index.css`
+- **Micro-interactions and empty states** — add motion, empty states, and icons tastefully to improve quality without distraction
+- **Placeholder UI elements** — when adding placeholders for not-yet-implemented features, show toast on click ("Feature coming soon")
+
+### Customized Defaults
+
+This template customizes some Tailwind/shadcn defaults for simplified usage:
+
+| Customization              | Behavior                                                                                                                                             |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `.container`               | Auto-centered with responsive padding (see `index.css`). Use directly without `mx-auto`/`px-*`. For custom widths, use `max-w-*` with `mx-auto px-4` |
+| `.flex`                    | Has `min-width: 0` and `min-height: 0` by default                                                                                                    |
+| `button` variant `outline` | Uses transparent background (not `bg-background`). Add bg color class manually if needed                                                             |
+
+### Common Pitfalls
+
+#### Invisible text from theme/color mismatches
+
+Semantic colors (`bg-background`, `text-foreground`) are CSS variables that resolve based on ThemeProvider's active theme. Mismatches cause invisible text.
+
+**Two critical rules:**
+1. **Match theme to CSS variables** — if `defaultTheme="dark"` in App.tsx, ensure `.dark {}` in index.css has dark background + light foreground values
+2. **Always pair bg with text** — when using `bg-{semantic}`, MUST also use `text-{semantic}-foreground` (not automatic - text inherits from parent otherwise)
+
+```tsx
+// ✅ Theme + CSS alignment
+<ThemeProvider defaultTheme="dark">  {/* Must match .dark in index.css */}
+  <div className="bg-background text-foreground">...</div>
+</ThemeProvider>
+
+// ✅ Required class pairs
+<div className="bg-popover text-popover-foreground">...</div>
+<div className="bg-card text-card-foreground">...</div>
+<div className="bg-accent text-accent-foreground">...</div>
+```
+
+#### Nested anchor tags in Link components
+
+Wrapping `<a>` tags inside another `<a>` or router's `<Link>` creates nested anchors and runtime errors.
+
+```tsx
+// ❌ Bad: <Link><a>...</a></Link>
+// ✅ Good: <Link>...</Link> — it already renders an <a> internally
+```
+
+#### Empty Select.Item values
+
+Every `<Select.Item>` must have a non-empty `value` prop—never `""`, `undefined`, or omitted.
+
+#### React render-phase side effects
+
+Never call `setState` or navigation in the render phase — wrap in `useEffect`.
+
 ## Deployment
 
 Your app is automatically built and deployed when you use the deploy tool.
