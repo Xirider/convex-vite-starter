@@ -323,6 +323,15 @@ This starter includes complete email/password authentication with OTP verificati
 4. Signed in with new password
 ```
 
+### Preview Mode (One-Click Test Login)
+
+In preview deployments, a prominent "Continue as Test User" button appears on login/signup pages for instant access without credentials. This is controlled by the `VITE_IS_PREVIEW` environment variable:
+
+- **Preview deployments**: `VITE_IS_PREVIEW=true` → Test login button visible
+- **Production deployments**: `VITE_IS_PREVIEW=false` → Test login button hidden
+
+The button automatically signs in as the test user (or creates the account if needed).
+
 ### Test User (for Automated Testing)
 
 A special test user is available for agents and Playwright testing that bypasses email verification:
