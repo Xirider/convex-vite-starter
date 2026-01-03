@@ -330,7 +330,7 @@ In preview deployments, a prominent "Continue as Test User" button appears on lo
 - **Preview deployments**: `VITE_IS_PREVIEW=true` → Test login button visible
 - **Production deployments**: `VITE_IS_PREVIEW=false` → Test login button hidden
 
-The button automatically signs in as the test user (or creates the account if needed).
+The button automatically signs in as the test user (or creates the account if needed). This is for the user to check out the preview app quickly without needing to login each time.
 
 ### Test User (for Automated Testing)
 
