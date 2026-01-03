@@ -4,14 +4,14 @@ import type * as React from "react";
 import { cn } from "@/lib/utils";
 
 const cardVariants = cva(
-  "bg-card text-card-foreground flex flex-col rounded-xl border",
+  "bg-card text-card-foreground flex flex-col rounded-2xl border",
   {
     variants: {
       variant: {
-        default: "shadow-sm",
-        elevated: "shadow-lg border-0",
+        default: "",
+        elevated: "shadow-lg border-0 bg-gradient-to-br from-card to-muted/30",
         interactive:
-          "shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5",
+          "transition-all hover:shadow-lg hover:border-foreground/10",
         ghost: "border-0 shadow-none bg-transparent",
       },
       padding: {

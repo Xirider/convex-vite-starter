@@ -1,6 +1,5 @@
 import { useConvexAuth } from "convex/react";
 import { Navigate, Outlet } from "react-router-dom";
-import { Skeleton } from "./ui/skeleton";
 import {
   Sidebar,
   SidebarContent,
@@ -12,6 +11,7 @@ import {
   SidebarMenuSkeleton,
   SidebarProvider,
 } from "./ui/sidebar";
+import { Skeleton } from "./ui/skeleton";
 
 function AppSkeleton() {
   return (
