@@ -397,10 +397,14 @@ runTest("My Feature Test", async helper => {
   const { page } = helper;
   // Already authenticated, starts on /
   await helper.goto("/dashboard");
+  await page.waitForTimeout(1500);  // Wait for Convex to sync
   await page.click("button");
+  await page.waitForTimeout(1500);
   await helper.screenshot("my-feature.png");
 }).catch(() => process.exit(1));
 ```
+
+**Tip**: Add short waits (1-2 seconds) between steps. Convex real-time updates and page loads can take a moment, which often causes flaky tests without delays.
 
 On failure, you'll see error screenshots, page content, console logs, and backend logs automatically.
 
