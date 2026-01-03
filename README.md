@@ -155,12 +155,12 @@ Changes here automatically apply to all pages and components.
 
 The project uses shared layout components for consistency:
 
-| Component       | Purpose                                              | Location                           |
-| --------------- | ---------------------------------------------------- | ---------------------------------- |
-| `Header`        | Navigation header for public pages                   | `src/components/Header.tsx`        |
-| `PublicLayout`  | Layout for public pages (landing, login, signup)     | `src/components/PublicLayout.tsx`  |
-| `AppLayout`     | Layout for authenticated pages (with sidebar)        | `src/components/AppLayout.tsx`     |
-| `AppSidebar`    | Sidebar navigation for authenticated users           | `src/components/AppSidebar.tsx`    |
+| Component      | Purpose                                          | Location                          |
+| -------------- | ------------------------------------------------ | --------------------------------- |
+| `Header`       | Navigation header for public pages               | `src/components/Header.tsx`       |
+| `PublicLayout` | Layout for public pages (landing, login, signup) | `src/components/PublicLayout.tsx` |
+| `AppLayout`    | Layout for authenticated pages (with sidebar)    | `src/components/AppLayout.tsx`    |
+| `AppSidebar`   | Sidebar navigation for authenticated users       | `src/components/AppSidebar.tsx`   |
 
 **Navigation patterns:**
 - **Public pages** use `PublicLayout` with a top header
