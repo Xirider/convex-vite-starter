@@ -8,9 +8,6 @@ export function PublicLayout() {
       <main className="flex-1 flex flex-col">
         <Outlet />
       </main>
-      <footer className="border-t py-6 text-center text-sm text-muted-foreground">
-        Built with Convex, React, and Vite
-      </footer>
     </div>
   );
 }

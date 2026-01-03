@@ -33,18 +33,17 @@ export const TestCredentials = ConvexCredentials<DataModel>({
     }
 
     if (flow === "signUp") {
-      let existing = null;
       try {
-        existing = await retrieveAccount(ctx, {
+        const existing = await retrieveAccount(ctx, {
           provider: "test",
-          account: { id: email },
+          account: {
+            id: email,
+            secret: password,
+          },
         });
+        return { userId: existing.user._id };
       } catch {
-        existing = null;
-      }
-
-      if (existing) {
-        throw new Error("Account already exists");
+        // Account doesn't exist or password doesn't match, create new
       }
 
       const { user } = await createAccount(ctx, {
@@ -75,7 +74,22 @@ export const TestCredentials = ConvexCredentials<DataModel>({
 
       return { userId: result.user._id };
     } catch {
-      throw new Error("Invalid email or password");
+      // Account doesn't exist, create it
+      const { user } = await createAccount(ctx, {
+        provider: "test",
+        account: {
+          id: email,
+          secret: password,
+        },
+        profile: {
+          email,
+          name: (params.name as string) || "Test User",
+          emailVerificationTime: Date.now(),
+        },
+        shouldLinkViaEmail: false,
+      });
+
+      return { userId: user._id };
     }
   },
 });

@@ -1,4 +1,5 @@
 import { useAuthActions } from "@convex-dev/auth/react";
+import { ArrowLeft, Loader2, Mail } from "lucide-react";
 import { useState } from "react";
 import { Button } from "./ui/button";
 import {
@@ -30,9 +31,11 @@ export function SignIn() {
   if (step === "signIn") {
     return (
       <Card>
-        <CardHeader>
-          <CardTitle>Sign In</CardTitle>
-          <CardDescription>Welcome back</CardDescription>
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-xl">Sign In</CardTitle>
+          <CardDescription>
+            Enter your credentials to access your account
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form
@@ -61,31 +64,40 @@ export function SignIn() {
                 name="email"
                 type="email"
                 placeholder="you@example.com"
+                autoComplete="email"
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Password</Label>
+                <Button
+                  type="button"
+                  variant="link"
+                  className="px-0 h-auto text-xs"
+                  onClick={() => setStep({ type: "forgot" })}
+                >
+                  Forgot password?
+                </Button>
+              </div>
               <Input
                 id="password"
                 name="password"
                 type="password"
                 placeholder="••••••••"
+                autoComplete="current-password"
                 required
               />
             </div>
             <input name="flow" value="signIn" type="hidden" />
-            {error && <p className="text-sm text-destructive">{error}</p>}
+            {error && (
+              <p className="text-sm text-destructive bg-destructive/10 rounded-md px-3 py-2">
+                {error}
+              </p>
+            )}
             <Button type="submit" className="w-full" disabled={loading}>
+              {loading && <Loader2 className="size-4 animate-spin" />}
               {loading ? "Signing in..." : "Sign In"}
-            </Button>
-            <Button
-              type="button"
-              variant="link"
-              className="w-full"
-              onClick={() => setStep({ type: "forgot" })}
-            >
-              Forgot password?
             </Button>
           </form>
         </CardContent>
@@ -96,8 +108,8 @@ export function SignIn() {
   if (step.type === "forgot") {
     return (
       <Card>
-        <CardHeader>
-          <CardTitle>Reset Password</CardTitle>
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-xl">Reset Password</CardTitle>
           <CardDescription>
             Enter your email to receive a reset code
           </CardDescription>
@@ -130,12 +142,18 @@ export function SignIn() {
                 type="email"
                 placeholder="you@example.com"
                 defaultValue={step.email}
+                autoComplete="email"
                 required
               />
             </div>
             <input name="flow" value="reset" type="hidden" />
-            {error && <p className="text-sm text-destructive">{error}</p>}
+            {error && (
+              <p className="text-sm text-destructive bg-destructive/10 rounded-md px-3 py-2">
+                {error}
+              </p>
+            )}
             <Button type="submit" className="w-full" disabled={loading}>
+              {loading && <Loader2 className="size-4 animate-spin" />}
               {loading ? "Sending..." : "Send Reset Code"}
             </Button>
             <Button
@@ -144,6 +162,7 @@ export function SignIn() {
               className="w-full"
               onClick={() => setStep("signIn")}
             >
+              <ArrowLeft className="size-4" />
               Back to sign in
             </Button>
           </form>
@@ -155,9 +174,16 @@ export function SignIn() {
   if (step.type === "reset-code") {
     return (
       <Card>
-        <CardHeader>
-          <CardTitle>Enter Reset Code</CardTitle>
-          <CardDescription>We sent a code to {step.email}</CardDescription>
+        <CardHeader className="space-y-1">
+          <div className="mx-auto size-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+            <Mail className="size-6 text-primary" />
+          </div>
+          <CardTitle className="text-xl text-center">
+            Check your email
+          </CardTitle>
+          <CardDescription className="text-center">
+            We sent a code to {step.email}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form
@@ -178,10 +204,15 @@ export function SignIn() {
                 type="text"
                 placeholder="Enter code from email"
                 autoComplete="one-time-code"
+                className="text-center tracking-widest"
                 required
               />
             </div>
-            {error && <p className="text-sm text-destructive">{error}</p>}
+            {error && (
+              <p className="text-sm text-destructive bg-destructive/10 rounded-md px-3 py-2">
+                {error}
+              </p>
+            )}
             <Button type="submit" className="w-full">
               Continue
             </Button>
@@ -201,8 +232,8 @@ export function SignIn() {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Set New Password</CardTitle>
+      <CardHeader className="space-y-1">
+        <CardTitle className="text-xl">Set New Password</CardTitle>
         <CardDescription>Choose a strong password</CardDescription>
       </CardHeader>
       <CardContent>
@@ -232,14 +263,20 @@ export function SignIn() {
               type="password"
               placeholder="••••••••"
               minLength={6}
+              autoComplete="new-password"
               required
             />
           </div>
           <input name="flow" value="reset-verification" type="hidden" />
           <input name="email" value={step.email} type="hidden" />
           <input name="code" value={step.code} type="hidden" />
-          {error && <p className="text-sm text-destructive">{error}</p>}
+          {error && (
+            <p className="text-sm text-destructive bg-destructive/10 rounded-md px-3 py-2">
+              {error}
+            </p>
+          )}
           <Button type="submit" className="w-full" disabled={loading}>
+            {loading && <Loader2 className="size-4 animate-spin" />}
             {loading ? "Resetting..." : "Reset Password"}
           </Button>
           <Button
@@ -248,6 +285,7 @@ export function SignIn() {
             className="w-full"
             onClick={() => setStep("signIn")}
           >
+            <ArrowLeft className="size-4" />
             Cancel
           </Button>
         </form>
