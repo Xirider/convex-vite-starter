@@ -104,7 +104,7 @@ grep VITE_CONVEX_URL .env.local
 | `bun run check`      | Lint + format check with Biome                |
 | `bun run format`     | Format & fix with Biome                       |
 | `bun run lint`       | Lint only with Biome                          |
-| `bun run screenshot` | Take screenshot of running app                |
+| `bun run screenshot [path] [name]` | Take screenshot of a page       |
 | `bun run test:auth`  | Set up test user authentication               |
 | `bun run test:demo`  | Run demo test with test user                  |
 
