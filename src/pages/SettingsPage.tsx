@@ -1,14 +1,6 @@
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useMutation, useQuery } from "convex/react";
-import {
-  Bell,
-  ChevronRight,
-  Loader2,
-  Moon,
-  Palette,
-  Sun,
-  User,
-} from "lucide-react";
+import { ChevronRight, Loader2, Moon, Palette, Sun, User } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -167,34 +159,6 @@ export function SettingsPage() {
               Theme follows your system preference
             </p>
           )}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="pb-4">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Bell className="size-4 text-muted-foreground" />
-            Notifications
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-1">
-          <SettingRow
-            id="email-notifications"
-            title="Email notifications"
-            description="Toggle description goes here"
-            defaultChecked
-          />
-          <SettingRow
-            id="push-notifications"
-            title="Push notifications"
-            description="Toggle description goes here"
-            defaultChecked
-          />
-          <SettingRow
-            id="marketing"
-            title="Marketing emails"
-            description="Toggle description goes here"
-          />
         </CardContent>
       </Card>
 
@@ -368,30 +332,6 @@ export function SettingsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
-  );
-}
-
-function SettingRow({
-  id,
-  title,
-  description,
-  defaultChecked = false,
-}: {
-  id: string;
-  title: string;
-  description: string;
-  defaultChecked?: boolean;
-}) {
-  return (
-    <div className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted/50">
-      <div>
-        <Label htmlFor={id} className="font-medium">
-          {title}
-        </Label>
-        <p className="text-sm text-muted-foreground">{description}</p>
-      </div>
-      <Switch id={id} defaultChecked={defaultChecked} />
     </div>
   );
 }
