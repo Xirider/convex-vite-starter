@@ -1,7 +1,7 @@
 import { createAccount, retrieveAccount } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import { Scrypt } from "lucia";
-import { internalMutation } from "./_generated/server";
+import { internalAction } from "./_generated/server";
 
 const TEST_USER = {
   email: "agent@test.local",
@@ -9,7 +9,7 @@ const TEST_USER = {
   name: "Test Agent",
 } as const;
 
-export const seedTestUser = internalMutation({
+export const seedTestUser = internalAction({
   args: {},
   returns: v.object({
     success: v.boolean(),
