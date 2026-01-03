@@ -51,21 +51,45 @@ interface TestResult {
   exitCode: number;
 }
 
+function getTestLabel(testFile: string): string {
+  const name = testFile.replace(/^scripts\//, "").replace(/\.ts$/, "");
+  return name.length > 20 ? name.slice(0, 17) + "..." : name.padEnd(20);
+}
+
 async function runTest(testFile: string): Promise<TestResult> {
   return new Promise(resolve => {
     const testPath = testFile.startsWith("/")
       ? testFile
       : join(projectRoot, testFile);
 
-    console.log(`🧪 Starting: ${testFile}`);
+    const label = getTestLabel(testFile);
+    console.log(`🧪 [${label}] Starting`);
 
     const test = spawn("bun", ["run", "--bun", testPath], {
       cwd: projectRoot,
-      stdio: "inherit",
+      stdio: ["ignore", "pipe", "pipe"],
       env: {
         ...process.env,
         APP_URL: PREVIEW_URL,
       },
+    });
+
+    test.stdout?.on("data", (data: Buffer) => {
+      const lines = data.toString().split("\n");
+      for (const line of lines) {
+        if (line.trim()) {
+          console.log(`[${label}] ${line}`);
+        }
+      }
+    });
+
+    test.stderr?.on("data", (data: Buffer) => {
+      const lines = data.toString().split("\n");
+      for (const line of lines) {
+        if (line.trim()) {
+          console.error(`[${label}] ${line}`);
+        }
+      }
     });
 
     test.on("close", code => {
@@ -73,7 +97,7 @@ async function runTest(testFile: string): Promise<TestResult> {
     });
 
     test.on("error", err => {
-      console.error(`Failed to run ${testFile}:`, err);
+      console.error(`[${label}] Failed to run:`, err);
       resolve({ file: testFile, exitCode: 1 });
     });
   });

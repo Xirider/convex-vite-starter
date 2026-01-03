@@ -59,6 +59,7 @@ async function main() {
 
     console.log(`📸 Taking screenshot of ${path}...\n`);
 
+    process.env.APP_URL = PREVIEW_URL;
     const helper = await createPageHelper();
 
     await helper.goto(path);

@@ -9,7 +9,9 @@ import { TEST_USER } from "./testUser";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-const APP_URL = process.env.APP_URL || "http://localhost:5173";
+function getAppUrl(): string {
+  return process.env.APP_URL || "http://localhost:5173";
+}
 const AUTH_STATE_PATH = join(__dirname, "..", "tmp", "auth-state.json");
 const TMP_DIR = join(__dirname, "..", "tmp");
 
@@ -116,7 +118,7 @@ export class PageHelper {
   }
 
   async goto(path: string): Promise<void> {
-    const url = path.startsWith("http") ? path : `${APP_URL}${path}`;
+    const url = path.startsWith("http") ? path : `${getAppUrl()}${path}`;
     await this.page.goto(url, { waitUntil: "networkidle" });
   }
 
@@ -132,7 +134,7 @@ async function isAuthenticated(page: Page): Promise<boolean> {
 }
 
 export async function ensureTestUserExists(page: Page): Promise<void> {
-  await page.goto(`${APP_URL}/signup`, { waitUntil: "networkidle" });
+  await page.goto(`${getAppUrl()}/signup`, { waitUntil: "networkidle" });
 
   if (await isAuthenticated(page)) {
     console.log("[Auth] Already logged in");
@@ -168,7 +170,7 @@ export async function ensureTestUserExists(page: Page): Promise<void> {
 }
 
 export async function signInTestUser(page: Page): Promise<void> {
-  await page.goto(`${APP_URL}/login`, { waitUntil: "networkidle" });
+  await page.goto(`${getAppUrl()}/login`, { waitUntil: "networkidle" });
 
   if (await isAuthenticated(page)) {
     console.log("[Auth] Already logged in");
@@ -226,7 +228,7 @@ export async function createAuthenticatedBrowser(): Promise<{
   const page = await context.newPage();
 
   // Check auth by going to login - if we get redirected, we're authenticated
-  await page.goto(`${APP_URL}/login`, { waitUntil: "networkidle" });
+  await page.goto(`${getAppUrl()}/login`, { waitUntil: "networkidle" });
 
   if (!(await isAuthenticated(page))) {
     await ensureTestUserExists(page);
@@ -247,7 +249,7 @@ export async function createPageHelper(): Promise<PageHelper> {
   const helper = new PageHelper(page, browser, context);
 
   // Check auth by going to login - if we stay on login, we need to authenticate
-  await page.goto(`${APP_URL}/login`, { waitUntil: "networkidle" });
+  await page.goto(`${getAppUrl()}/login`, { waitUntil: "networkidle" });
 
   if (!(await isAuthenticated(page))) {
     // Not authenticated - log in
@@ -256,7 +258,7 @@ export async function createPageHelper(): Promise<PageHelper> {
   }
 
   // Navigate to root - test can go wherever it needs from here
-  await page.goto(`${APP_URL}/`, { waitUntil: "networkidle" });
+  await page.goto(`${getAppUrl()}/`, { waitUntil: "networkidle" });
 
   return helper;
 }

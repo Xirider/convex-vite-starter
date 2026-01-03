@@ -53,7 +53,7 @@ If you can't run background processes, use these one-shot commands:
 # Push Convex functions once (no watching)
 bun run sync
 
-# Push Convex + build frontend in one command
+# Push Convex + build frontend in one command (most important one)
 bun run sync:build
 
 # Fetch recent backend logs afterwards (exits after 5s)
@@ -83,7 +83,7 @@ The `test` command handles the Vite server lifecycle automatically:
 3. Runs your test with `APP_URL` set correctly
 4. Stops the Vite server when done
 
-Note: The Convex backend is always running in the cloud — only the frontend server needs to be started locally.
+Note: The Convex backend is always running in the cloud after runnning the sync command — only the frontend server needs to be started locally.
 
 ### Taking Screenshots
 
