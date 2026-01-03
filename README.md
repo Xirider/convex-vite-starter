@@ -77,11 +77,13 @@ bun run test scripts/demo-test.ts
 bun run test scripts/test-feature1.ts scripts/test-feature2.ts
 ```
 
-The `test` command handles the full lifecycle:
-1. Starts `vite preview` (serves built files on port 4173)
+The `test` command handles the Vite server lifecycle automatically:
+1. Starts `vite preview` (serves built frontend files on port 4173)
 2. Waits for server to be ready
 3. Runs your test with `APP_URL` set correctly
-4. Stops the server when done
+4. Stops the Vite server when done
+
+Note: The Convex backend is always running in the cloud — only the frontend server needs to be started locally.
 
 ### Taking Screenshots
 
@@ -97,7 +99,7 @@ bun run screenshot /dashboard dashboard.png
 bun run screenshot /settings settings.png
 ```
 
-The `screenshot` command also starts the preview server automatically.
+The `screenshot` command also starts the Vite preview server automatically.
 
 ### Troubleshooting
 
