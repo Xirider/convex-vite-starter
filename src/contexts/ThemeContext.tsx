@@ -10,23 +10,34 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+function getSystemTheme(): Theme {
+  if (typeof window !== "undefined" && window.matchMedia) {
+    return window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
+  }
+  return "light";
+}
+
 interface ThemeProviderProps {
   children: React.ReactNode;
-  defaultTheme?: Theme;
+  defaultTheme?: Theme | "system";
   switchable?: boolean;
 }
 
 export function ThemeProvider({
   children,
-  defaultTheme = "light",
+  defaultTheme = "system",
   switchable = false,
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(() => {
     if (switchable) {
       const stored = localStorage.getItem("theme");
-      return (stored as Theme) || defaultTheme;
+      if (stored === "light" || stored === "dark") {
+        return stored;
+      }
     }
-    return defaultTheme;
+    return defaultTheme === "system" ? getSystemTheme() : defaultTheme;
   });
 
   useEffect(() => {
@@ -41,6 +52,18 @@ export function ThemeProvider({
       localStorage.setItem("theme", theme);
     }
   }, [theme, switchable]);
+
+  useEffect(() => {
+    if (defaultTheme !== "system" || switchable) return;
+
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleChange = (e: MediaQueryListEvent) => {
+      setTheme(e.matches ? "dark" : "light");
+    };
+
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, [defaultTheme, switchable]);
 
   const toggleTheme = switchable
     ? () => {

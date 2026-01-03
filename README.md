@@ -90,20 +90,23 @@ grep VITE_CONVEX_URL .env.local
 
 ```
 ├── convex/              # Backend
-│   ├── auth.ts          # Auth config
+│   ├── auth.ts          # Auth config & currentUser query
+│   ├── users.ts         # User mutations (deleteAccount)
 │   ├── http.ts          # HTTP routes
 │   └── schema.ts        # Database schema
 ├── src/
 │   ├── components/
-│   │   ├── ui/          # 53 shadcn components
-│   │   ├── Header.tsx   # Shared header (adapts to auth state)
-│   │   ├── Layout.tsx   # Authenticated pages layout
+│   │   ├── ui/          # shadcn components (including sidebar)
+│   │   ├── AppLayout.tsx     # Authenticated pages layout (with sidebar)
+│   │   ├── AppSidebar.tsx    # Sidebar navigation for authenticated users
+│   │   ├── Header.tsx        # Public pages header
 │   │   ├── PublicLayout.tsx  # Public pages layout (landing, login, signup)
-│   │   ├── SignIn.tsx   # Sign in form
-│   │   └── SignUp.tsx   # Sign up form
+│   │   ├── ProtectedRoute.tsx # Auth guard with loading skeleton
+│   │   ├── SignIn.tsx        # Sign in form
+│   │   └── SignUp.tsx        # Sign up form
 │   ├── pages/           # Page components
-│   ├── contexts/        # ThemeContext
-│   ├── hooks/           # useIsMobile, etc.
+│   ├── contexts/        # ThemeContext (with system preference support)
+│   ├── hooks/           # use-mobile, usePersistFn, useComposition
 │   ├── lib/             # cn() utility
 │   ├── App.tsx          # Main app with routes & providers
 │   └── index.css        # Tailwind theme (CSS variables)
@@ -122,12 +125,26 @@ All colors, spacing, and visual tokens are defined in `src/index.css`. Change th
 
 ```css
 :root {
-  --primary: var(--color-blue-700);      /* Main action color */
-  --primary-foreground: var(--color-blue-50);
-  --background: oklch(1 0 0);            /* Page background */
-  --foreground: oklch(0.235 0.015 65);   /* Text color */
-  --card: oklch(1 0 0);                  /* Card backgrounds */
-  --radius: 0.65rem;                     /* Border radius */
+  /* Primary colors */
+  --primary: var(--color-slate-900);     /* Main action color (dark, modern) */
+  --primary-foreground: var(--color-white);
+
+  /* Semantic colors */
+  --success: var(--color-emerald-600);
+  --warning: var(--color-amber-500);
+  --info: var(--color-cyan-500);
+
+  /* Chart/accent colors (for stats, icons, highlights) */
+  --chart-1: var(--color-teal-500);
+  --chart-2: var(--color-orange-500);
+  --chart-3: var(--color-cyan-500);
+  --chart-4: var(--color-rose-500);
+  --chart-5: var(--color-lime-500);
+
+  /* Sidebar */
+  --sidebar-width: 16rem;
+
+  --radius: 0.625rem;                    /* Border radius */
   /* ... other tokens */
 }
 ```
@@ -138,13 +155,19 @@ Changes here automatically apply to all pages and components.
 
 The project uses shared layout components for consistency:
 
-| Component      | Purpose                                              | Location                          |
-| -------------- | ---------------------------------------------------- | --------------------------------- |
-| `Header`       | Shared navigation header (adapts to auth state)      | `src/components/Header.tsx`       |
-| `PublicLayout` | Layout for public pages (landing, login, signup)     | `src/components/PublicLayout.tsx` |
-| `Layout`       | Layout for authenticated pages (dashboard, settings) | `src/components/Layout.tsx`       |
+| Component       | Purpose                                              | Location                           |
+| --------------- | ---------------------------------------------------- | ---------------------------------- |
+| `Header`        | Navigation header for public pages                   | `src/components/Header.tsx`        |
+| `PublicLayout`  | Layout for public pages (landing, login, signup)     | `src/components/PublicLayout.tsx`  |
+| `AppLayout`     | Layout for authenticated pages (with sidebar)        | `src/components/AppLayout.tsx`     |
+| `AppSidebar`    | Sidebar navigation for authenticated users           | `src/components/AppSidebar.tsx`    |
 
-**To change the app name, header, or footer** — edit these shared components once and all pages update.
+**Navigation patterns:**
+- **Public pages** use `PublicLayout` with a top header
+- **Authenticated pages** use `AppLayout` with a sidebar (shadcn/ui sidebar component)
+- On mobile, the sidebar becomes a full-screen slide-out menu
+
+**To change the app name or branding** — edit `Header.tsx` (public) and `AppSidebar.tsx` (authenticated).
 
 ### 3. Remove Unused Pages
 
@@ -167,20 +190,39 @@ Each page in `src/pages/` uses the shared UI components from `src/components/ui/
 
 ### 🎨 Theming
 
-Full light/dark mode support with OKLCH colors:
+Full light/dark mode support with OKLCH colors and system preference detection:
 
 ```tsx
 import { useTheme } from "@/contexts/ThemeContext";
 
 function ThemeToggle() {
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, switchable } = useTheme();
+  if (!switchable) return null;
   return <button onClick={toggleTheme}>{theme}</button>;
 }
 ```
 
+**Theme options in `App.tsx`:**
+```tsx
+// Use system preference (default)
+<ThemeProvider defaultTheme="system" switchable>
+
+// Force light or dark
+<ThemeProvider defaultTheme="light" switchable>
+<ThemeProvider defaultTheme="dark" switchable>
+
+// Follow system, no toggle
+<ThemeProvider defaultTheme="system" switchable={false}>
+```
+
+**Priority:** User's saved preference (localStorage) → System preference → Fallback
+
 Customize colors in `src/index.css`:
 - `--primary`, `--secondary`, `--accent`, `--destructive`
+- `--success`, `--warning`, `--info` (semantic colors)
+- `--chart-1` through `--chart-5` (accent colors for stats, icons)
 - `--background`, `--foreground`, `--muted`, `--card`
+- `--sidebar-*` (sidebar-specific colors)
 - `--radius` for border radius
 
 ### 🧱 Components
@@ -194,7 +236,7 @@ bunx shadcn@latest add [component-name]
 ### 📱 Responsive
 
 ```tsx
-import { useIsMobile } from "@/hooks/useMobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 function Layout() {
   const isMobile = useIsMobile();
@@ -220,13 +262,15 @@ App-level `ErrorBoundary` catches errors gracefully.
 | Hook                      | Purpose                                                                                                                                               |
 | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `useIsMobile()`           | Returns `true` when viewport < 768px. Reactive to window resize.                                                                                      |
+| `useSidebar()`            | Access sidebar state (open, collapsed, mobile). Must be used inside `SidebarProvider`.                                                                |
 | `usePersistFn(fn)`        | Returns a stable function reference that always calls the latest `fn`. Like `useCallback` but never stale.                                            |
 | `useComposition(options)` | Handles IME composition for CJK language input. Blocks Enter/Escape during character composition to prevent accidental form submits or dialog closes. |
 
 ```tsx
-import { useIsMobile } from "@/hooks/useMobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { usePersistFn } from "@/hooks/usePersistFn";
 import { useComposition } from "@/hooks/useComposition";
+import { useSidebar } from "@/components/ui/sidebar";
 ```
 
 ## Environment Variables
