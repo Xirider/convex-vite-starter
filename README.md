@@ -16,22 +16,7 @@ A production-ready full-stack web app template.
 - **TypeScript** — Full type safety
 - **Bun** — Fast package manager & runtime
 
-### Convex Platform Features
-
-- **Real-time Subscriptions** — Queries automatically update when data changes
-- **ACID Transactions** — Mutations are atomic and consistent
-- **File Storage** — Upload, store, and serve files with `ctx.storage`
-- **Full-Text Search** — Built-in text search with `searchIndex`
-- **Vector Search** — Semantic search for AI embeddings with `vectorIndex`
-- **Scheduled Functions** — Cron jobs and delayed execution with `ctx.scheduler`
-- **HTTP Endpoints** — REST APIs and webhooks via `httpRouter`
-- **Authentication** — Convex Auth with multiple providers
-- **TypeScript-First** — End-to-end type safety from DB to frontend
-- **Pagination** — Cursor-based pagination with `.paginate()`
-- **Indexes** — Secondary indexes for efficient queries
-- **Environment Variables** — Secure runtime configuration
-- **Function Logs** — Real-time logging and debugging
-- **Automatic Caching** — Query results cached and invalidated automatically
+**Convex includes**: real-time subscriptions, ACID transactions, file storage, full-text & vector search, scheduled functions, HTTP endpoints, and automatic caching. See [Convex docs](https://docs.convex.dev/) for details.
 
 ## Quick Start
 
@@ -83,7 +68,9 @@ The `test` command handles the Vite server lifecycle automatically:
 3. Runs your test with `APP_URL` set correctly
 4. Stops the Vite server when done
 
-Note: The Convex backend is always running in the cloud after runnning the sync command — only the frontend server needs to be started locally.
+Note: The Convex backend is always running in the cloud after running the sync command — only the frontend server needs to be started locally.
+
+Your app is automatically built and deployed when you use the deploy tool.
 
 ### Taking Screenshots
 
@@ -153,6 +140,14 @@ grep VITE_CONVEX_URL .env.local
 ├── biome.json           # Biome config (linting + formatting)
 ├── components.json      # shadcn CLI config
 └── package.json
+```
+
+**Path alias**: Use `@/` for clean imports:
+
+```tsx
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { useTheme } from "@/contexts/ThemeContext";
 ```
 
 ## Customizing This Starter
@@ -265,37 +260,12 @@ Customize colors in `src/index.css`:
 - `--sidebar-*` (sidebar-specific colors)
 - `--radius` for border radius
 
-### 🧱 Components
+### 🧱 Built-in Features
 
-53 pre-installed shadcn/ui components. Add more with:
-
-```bash
-bunx shadcn@latest add [component-name]
-```
-
-### 📱 Responsive
-
-```tsx
-import { useIsMobile } from "@/hooks/use-mobile";
-
-function Layout() {
-  const isMobile = useIsMobile();
-  return isMobile ? <MobileNav /> : <DesktopNav />;
-}
-```
-
-### 🔔 Toasts
-
-```tsx
-import { toast } from "sonner";
-
-toast.success("Saved!");
-toast.error("Something went wrong");
-```
-
-### 🛡️ Error Handling
-
-App-level `ErrorBoundary` catches errors gracefully.
+- **53 shadcn/ui components** — add more with `bunx shadcn@latest add [component-name]`
+- **Responsive hook** — `useIsMobile()` returns true when viewport < 768px
+- **Toast notifications** — `toast.success("Saved!")` / `toast.error("Failed")` via Sonner
+- **Error boundary** — app-level error catching
 
 ### 🛠️ Utility Hooks
 
@@ -418,117 +388,32 @@ The button automatically signs in as the test user (or creates the account if ne
 
 ### Test User (for Automated Testing)
 
-A special test user is available for agents and Playwright testing that bypasses email verification:
-
-| Field    | Value              |
-| -------- | ------------------ |
-| Email    | `agent@test.local` |
-| Password | `TestAgent123!`    |
-| Name     | `Test Agent`       |
-
-**Usage with Playwright (recommended):**
-
-Use `runTest()` for automatic error handling. The page is **already logged in** as the test user when your test function runs:
+Always use `runTest()` for e2e tests — it automatically logs in as the test user (`agent@test.local` / `TestAgent123!`):
 
 ```ts
 import { runTest } from "./scripts/auth";
 
 runTest("My Feature Test", async helper => {
   const { page } = helper;
-  // ✅ Already authenticated as test user (agent@test.local)
-  // ✅ Starts on / - navigate to the page you want to test
-
+  // Already authenticated, starts on /
   await helper.goto("/dashboard");
   await page.click("button");
   await helper.screenshot("my-feature.png");
-
-  const hasElement = await page.locator("text=Success").isVisible();
-  if (!hasElement) {
-    throw new Error("Expected Success message");
-  }
 }).catch(() => process.exit(1));
 ```
 
-On failure, you'll automatically see:
-- 📸 Error screenshot saved to `tmp/error-{timestamp}.png`
-- 🔍 Current URL and page title
-- 📄 Full page text content
-- 📋 All browser console logs (with ❌ for errors, ⚠️ for warnings)
-- 🔧 Recent Convex backend logs (queries, mutations, actions, errors)
-
-**Manual control (if needed):**
-
-```ts
-import { createPageHelper } from "./scripts/auth";
-
-const helper = await createPageHelper();
-// ✅ Already authenticated as test user (agent@test.local)
-// ✅ Starts on / - navigate wherever you need
-
-// Navigate and interact
-await helper.goto("/some-page");
-await helper.page.click("button");
-
-// Debugging helpers
-await helper.screenshot("my-screenshot.png");  // Save screenshot
-await helper.printPageContent();               // Print page text
-helper.printConsoleLogs();                     // Print browser console
-await helper.printDebugInfo();                 // Print everything
-
-// Get debug data programmatically
-const logs = helper.getConsoleLogs();          // Array of console logs
-const content = await helper.getPageContent(); // Page text content
-const info = await helper.getDebugInfo();      // Full debug info object
-
-// Clean up
-await helper.close();
-```
-
-**Console Log Capture:**
-
-```ts
-// Console logs are automatically captured
-const logs = helper.getConsoleLogs();
-// Returns: [{ type: "error", text: "...", timestamp: Date, location: "..." }, ...]
-
-// Filter for errors
-const errors = logs.filter(log => log.type === "error");
-
-// Print formatted logs
-helper.printConsoleLogs();
-// Output:
-// 📋 Console Logs:
-// ────────────────────────────────────────────────
-// ❌ [ERROR] Something went wrong
-// ⚠️ [WARNING] Deprecated API used
-//    [LOG] Normal log message
-// ────────────────────────────────────────────────
-```
-
-**How it works:**
-- Emails ending in `@test.local` use the `test` auth provider
-- The `test` provider creates pre-verified accounts instantly (no OTP required)
-- Auth state is cached in `tmp/auth-state.json` for faster subsequent runs
-- Browser console logs are captured automatically for debugging
-
-**Scripts:**
-- `bun run test:auth` — Set up the test user and print debug info
-- `bun run test:demo` — Run demo test with full debugging output
-- `bun run screenshot` — Take authenticated screenshot with console logs
+On failure, you'll see error screenshots, page content, console logs, and backend logs automatically.
 
 ### Customizing Auth
 
-Email templates are in `convex/ViktorSpacesEmail.ts`. Modify:
-- `subject` — Email subject line
-- `heading` / `description` — Email body text
-- `maxAge` — OTP expiration (default: 15 minutes)
+Email templates are in `convex/ViktorSpacesEmail.ts`.
 
 ### Internal Apps (Domain Restriction)
 
-If an internal app is requestted, a good way to approach this is to restrict signups to specific email domains (e.g., only `@yourcompany.com`), modify `convex/ViktorSpacesEmail.ts`:
+For internal apps, restrict signups to the user's company Slack email domain. Extract the allowed domain from the user's Slack email address (by listing all the users in the company Slack workspace) and modify `convex/ViktorSpacesEmail.ts`:
 
 ```ts
-const ALLOWED_DOMAINS = ["yourcompany.com", "subsidiary.io"];
+const ALLOWED_DOMAINS = ["yourcompany.com"]; // Use your Slack workspace email domains
 
 export const ViktorSpacesEmail: EmailConfig = {
   async sendVerificationRequest({ identifier: email }) {
@@ -655,58 +540,6 @@ This template customizes some Tailwind/shadcn defaults for simplified usage:
 | `.flex`                    | Has `min-width: 0` and `min-height: 0` by default                                                                                                    |
 | `button` variant `outline` | Uses transparent background (not `bg-background`). Add bg color class manually if needed                                                             |
 
-### Common Pitfalls
-
-#### Invisible text from theme/color mismatches
-
-Semantic colors (`bg-background`, `text-foreground`) are CSS variables that resolve based on ThemeProvider's active theme. Mismatches cause invisible text.
-
-**Two critical rules:**
-1. **Match theme to CSS variables** — if `defaultTheme="dark"` in App.tsx, ensure `.dark {}` in index.css has dark background + light foreground values
-2. **Always pair bg with text** — when using `bg-{semantic}`, MUST also use `text-{semantic}-foreground` (not automatic - text inherits from parent otherwise)
-
-```tsx
-// ✅ Theme + CSS alignment
-<ThemeProvider defaultTheme="dark">  {/* Must match .dark in index.css */}
-  <div className="bg-background text-foreground">...</div>
-</ThemeProvider>
-
-// ✅ Required class pairs
-<div className="bg-popover text-popover-foreground">...</div>
-<div className="bg-card text-card-foreground">...</div>
-<div className="bg-accent text-accent-foreground">...</div>
-```
-
-#### Nested anchor tags in Link components
-
-Wrapping `<a>` tags inside another `<a>` or router's `<Link>` creates nested anchors and runtime errors.
-
-```tsx
-// ❌ Bad: <Link><a>...</a></Link>
-// ✅ Good: <Link>...</Link> — it already renders an <a> internally
-```
-
-#### Empty Select.Item values
-
-Every `<Select.Item>` must have a non-empty `value` prop—never `""`, `undefined`, or omitted.
-
-#### React render-phase side effects
-
-Never call `setState` or navigation in the render phase — wrap in `useEffect`.
-
-## Deployment
-
-Your app is automatically built and deployed when you use the deploy tool.
-
-## Path Aliases
-
-Clean imports with `@/`:
-
-```tsx
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { useTheme } from "@/contexts/ThemeContext";
-```
 
 ## Convex Cheatsheet
 
