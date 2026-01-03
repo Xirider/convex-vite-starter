@@ -2,13 +2,7 @@ import { useAuthActions } from "@convex-dev/auth/react";
 import { ArrowLeft, Loader2, Mail } from "lucide-react";
 import { useState } from "react";
 import { Button } from "./ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "./ui/card";
+import { Card, CardContent } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 
@@ -26,12 +20,8 @@ export function SignUp() {
 
   if (step === "signUp") {
     return (
-      <Card>
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-xl">Create Account</CardTitle>
-          <CardDescription>Enter your details to get started</CardDescription>
-        </CardHeader>
-        <CardContent>
+      <Card variant="elevated">
+        <CardContent className="pt-6">
           <form
             onSubmit={async e => {
               e.preventDefault();
@@ -62,6 +52,7 @@ export function SignUp() {
                 type="text"
                 placeholder="Your name"
                 autoComplete="name"
+                className="h-11"
                 required
               />
             </div>
@@ -73,6 +64,7 @@ export function SignUp() {
                 type="email"
                 placeholder="you@example.com"
                 autoComplete="email"
+                className="h-11"
                 required
               />
             </div>
@@ -85,6 +77,7 @@ export function SignUp() {
                 placeholder="••••••••"
                 minLength={6}
                 autoComplete="new-password"
+                className="h-11"
                 required
               />
               <p className="text-xs text-muted-foreground">
@@ -93,11 +86,11 @@ export function SignUp() {
             </div>
             <input name="flow" value="signUp" type="hidden" />
             {error && (
-              <p className="text-sm text-destructive bg-destructive/10 rounded-md px-3 py-2">
+              <p className="text-sm text-destructive bg-destructive/10 rounded-lg px-3 py-2">
                 {error}
               </p>
             )}
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full h-11" disabled={loading}>
               {loading && <Loader2 className="size-4 animate-spin" />}
               {loading ? "Creating account..." : "Create Account"}
             </Button>
@@ -108,17 +101,17 @@ export function SignUp() {
   }
 
   return (
-    <Card>
-      <CardHeader className="space-y-1">
-        <div className="mx-auto size-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-          <Mail className="size-6 text-primary" />
+    <Card variant="elevated">
+      <CardContent className="pt-6">
+        <div className="text-center mb-6">
+          <div className="mx-auto size-12 rounded-full bg-primary flex items-center justify-center mb-4">
+            <Mail className="size-6 text-primary-foreground" />
+          </div>
+          <h2 className="font-semibold text-lg">Check your email</h2>
+          <p className="text-sm text-muted-foreground">
+            We sent a verification code to {step.email}
+          </p>
         </div>
-        <CardTitle className="text-xl text-center">Check your email</CardTitle>
-        <CardDescription className="text-center">
-          We sent a verification code to {step.email}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
         <form
           onSubmit={async e => {
             e.preventDefault();
@@ -142,20 +135,20 @@ export function SignUp() {
               id="code"
               name="code"
               type="text"
-              placeholder="Enter 6-digit code"
+              placeholder="Enter code"
               autoComplete="one-time-code"
-              className="text-center tracking-widest"
+              className="h-11 text-center tracking-[0.5em] font-mono"
               required
             />
           </div>
           <input name="flow" value="email-verification" type="hidden" />
           <input name="email" value={step.email} type="hidden" />
           {error && (
-            <p className="text-sm text-destructive bg-destructive/10 rounded-md px-3 py-2">
+            <p className="text-sm text-destructive bg-destructive/10 rounded-lg px-3 py-2">
               {error}
             </p>
           )}
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button type="submit" className="w-full h-11" disabled={loading}>
             {loading && <Loader2 className="size-4 animate-spin" />}
             {loading ? "Verifying..." : "Verify Email"}
           </Button>

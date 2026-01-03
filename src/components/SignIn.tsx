@@ -2,13 +2,7 @@ import { useAuthActions } from "@convex-dev/auth/react";
 import { ArrowLeft, Loader2, Mail } from "lucide-react";
 import { useState } from "react";
 import { Button } from "./ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "./ui/card";
+import { Card, CardContent } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 
@@ -30,14 +24,8 @@ export function SignIn() {
 
   if (step === "signIn") {
     return (
-      <Card>
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-xl">Sign In</CardTitle>
-          <CardDescription>
-            Enter your credentials to access your account
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+      <Card variant="elevated">
+        <CardContent className="pt-6">
           <form
             onSubmit={async e => {
               e.preventDefault();
@@ -65,6 +53,7 @@ export function SignIn() {
                 type="email"
                 placeholder="you@example.com"
                 autoComplete="email"
+                className="h-11"
                 required
               />
             </div>
@@ -74,7 +63,7 @@ export function SignIn() {
                 <Button
                   type="button"
                   variant="link"
-                  className="px-0 h-auto text-xs"
+                  className="px-0 h-auto text-xs text-muted-foreground hover:text-primary"
                   onClick={() => setStep({ type: "forgot" })}
                 >
                   Forgot password?
@@ -86,16 +75,17 @@ export function SignIn() {
                 type="password"
                 placeholder="••••••••"
                 autoComplete="current-password"
+                className="h-11"
                 required
               />
             </div>
             <input name="flow" value="signIn" type="hidden" />
             {error && (
-              <p className="text-sm text-destructive bg-destructive/10 rounded-md px-3 py-2">
+              <p className="text-sm text-destructive bg-destructive/10 rounded-lg px-3 py-2">
                 {error}
               </p>
             )}
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full h-11" disabled={loading}>
               {loading && <Loader2 className="size-4 animate-spin" />}
               {loading ? "Signing in..." : "Sign In"}
             </Button>
@@ -107,14 +97,14 @@ export function SignIn() {
 
   if (step.type === "forgot") {
     return (
-      <Card>
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-xl">Reset Password</CardTitle>
-          <CardDescription>
-            Enter your email to receive a reset code
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+      <Card variant="elevated">
+        <CardContent className="pt-6">
+          <div className="text-center mb-6">
+            <h2 className="font-semibold text-lg">Reset Password</h2>
+            <p className="text-sm text-muted-foreground">
+              Enter your email to receive a reset code
+            </p>
+          </div>
           <form
             onSubmit={async e => {
               e.preventDefault();
@@ -143,16 +133,17 @@ export function SignIn() {
                 placeholder="you@example.com"
                 defaultValue={step.email}
                 autoComplete="email"
+                className="h-11"
                 required
               />
             </div>
             <input name="flow" value="reset" type="hidden" />
             {error && (
-              <p className="text-sm text-destructive bg-destructive/10 rounded-md px-3 py-2">
+              <p className="text-sm text-destructive bg-destructive/10 rounded-lg px-3 py-2">
                 {error}
               </p>
             )}
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full h-11" disabled={loading}>
               {loading && <Loader2 className="size-4 animate-spin" />}
               {loading ? "Sending..." : "Send Reset Code"}
             </Button>
@@ -173,19 +164,17 @@ export function SignIn() {
 
   if (step.type === "reset-code") {
     return (
-      <Card>
-        <CardHeader className="space-y-1">
-          <div className="mx-auto size-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-            <Mail className="size-6 text-primary" />
+      <Card variant="elevated">
+        <CardContent className="pt-6">
+          <div className="text-center mb-6">
+            <div className="mx-auto size-12 rounded-full bg-primary flex items-center justify-center mb-4">
+              <Mail className="size-6 text-primary-foreground" />
+            </div>
+            <h2 className="font-semibold text-lg">Check your email</h2>
+            <p className="text-sm text-muted-foreground">
+              We sent a code to {step.email}
+            </p>
           </div>
-          <CardTitle className="text-xl text-center">
-            Check your email
-          </CardTitle>
-          <CardDescription className="text-center">
-            We sent a code to {step.email}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
           <form
             onSubmit={e => {
               e.preventDefault();
@@ -202,18 +191,18 @@ export function SignIn() {
                 id="code"
                 name="code"
                 type="text"
-                placeholder="Enter code from email"
+                placeholder="Enter code"
                 autoComplete="one-time-code"
-                className="text-center tracking-widest"
+                className="h-11 text-center tracking-[0.5em] font-mono"
                 required
               />
             </div>
             {error && (
-              <p className="text-sm text-destructive bg-destructive/10 rounded-md px-3 py-2">
+              <p className="text-sm text-destructive bg-destructive/10 rounded-lg px-3 py-2">
                 {error}
               </p>
             )}
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full h-11">
               Continue
             </Button>
             <Button
@@ -231,12 +220,14 @@ export function SignIn() {
   }
 
   return (
-    <Card>
-      <CardHeader className="space-y-1">
-        <CardTitle className="text-xl">Set New Password</CardTitle>
-        <CardDescription>Choose a strong password</CardDescription>
-      </CardHeader>
-      <CardContent>
+    <Card variant="elevated">
+      <CardContent className="pt-6">
+        <div className="text-center mb-6">
+          <h2 className="font-semibold text-lg">Set New Password</h2>
+          <p className="text-sm text-muted-foreground">
+            Choose a strong password
+          </p>
+        </div>
         <form
           onSubmit={async e => {
             e.preventDefault();
@@ -264,6 +255,7 @@ export function SignIn() {
               placeholder="••••••••"
               minLength={6}
               autoComplete="new-password"
+              className="h-11"
               required
             />
           </div>
@@ -271,11 +263,11 @@ export function SignIn() {
           <input name="email" value={step.email} type="hidden" />
           <input name="code" value={step.code} type="hidden" />
           {error && (
-            <p className="text-sm text-destructive bg-destructive/10 rounded-md px-3 py-2">
+            <p className="text-sm text-destructive bg-destructive/10 rounded-lg px-3 py-2">
               {error}
             </p>
           )}
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button type="submit" className="w-full h-11" disabled={loading}>
             {loading && <Loader2 className="size-4 animate-spin" />}
             {loading ? "Resetting..." : "Reset Password"}
           </Button>
