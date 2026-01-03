@@ -1,3 +1,4 @@
+import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
 import { dirname, join } from "node:path";
@@ -124,20 +125,16 @@ export class PageHelper {
   }
 }
 
-async function isOnDashboard(page: Page): Promise<boolean> {
-  return (
-    page.url().includes("/dashboard") ||
-    (await page
-      .locator("text=Dashboard")
-      .isVisible()
-      .catch(() => false))
-  );
+async function isAuthenticated(page: Page): Promise<boolean> {
+  // If we're on /login or /signup, we're not authenticated
+  const url = page.url();
+  return !url.includes("/login") && !url.includes("/signup");
 }
 
 export async function ensureTestUserExists(page: Page): Promise<void> {
   await page.goto(`${APP_URL}/signup`, { waitUntil: "networkidle" });
 
-  if (await isOnDashboard(page)) {
+  if (await isAuthenticated(page)) {
     console.log("[Auth] Already logged in");
     return;
   }
@@ -153,7 +150,7 @@ export async function ensureTestUserExists(page: Page): Promise<void> {
     await page.locator("button[type='submit']").click();
     await page.waitForTimeout(1000);
 
-    if (await isOnDashboard(page)) {
+    if (await isAuthenticated(page)) {
       console.log("[Auth] Test user created and logged in");
       return;
     }
@@ -173,7 +170,7 @@ export async function ensureTestUserExists(page: Page): Promise<void> {
 export async function signInTestUser(page: Page): Promise<void> {
   await page.goto(`${APP_URL}/login`, { waitUntil: "networkidle" });
 
-  if (await isOnDashboard(page)) {
+  if (await isAuthenticated(page)) {
     console.log("[Auth] Already logged in");
     return;
   }
@@ -185,16 +182,15 @@ export async function signInTestUser(page: Page): Promise<void> {
 
   await page.waitForTimeout(3000);
 
-  if (!(await isOnDashboard(page))) {
+  if (!(await isAuthenticated(page))) {
     console.log("[Auth] Refreshing page to check auth state...");
     await page.reload({ waitUntil: "networkidle" });
     await page.waitForTimeout(2000);
   }
 
-  try {
-    await page.waitForURL("**/dashboard", { timeout: 10000 });
+  if (await isAuthenticated(page)) {
     console.log("[Auth] Signed in successfully");
-  } catch {
+  } else {
     await mkdir(TMP_DIR, { recursive: true });
     await page.screenshot({ path: join(TMP_DIR, "auth-debug.png") });
     const content = await page.locator("body").innerText();
@@ -229,9 +225,10 @@ export async function createAuthenticatedBrowser(): Promise<{
   );
   const page = await context.newPage();
 
-  await page.goto(`${APP_URL}/dashboard`, { waitUntil: "networkidle" });
+  // Check auth by going to login - if we get redirected, we're authenticated
+  await page.goto(`${APP_URL}/login`, { waitUntil: "networkidle" });
 
-  if (!(await isOnDashboard(page))) {
+  if (!(await isAuthenticated(page))) {
     await ensureTestUserExists(page);
     await saveAuthState(page);
   }
@@ -249,14 +246,98 @@ export async function createPageHelper(): Promise<PageHelper> {
 
   const helper = new PageHelper(page, browser, context);
 
-  await page.goto(`${APP_URL}/dashboard`, { waitUntil: "networkidle" });
+  // Check auth by going to login - if we stay on login, we need to authenticate
+  await page.goto(`${APP_URL}/login`, { waitUntil: "networkidle" });
 
-  if (!(await isOnDashboard(page))) {
+  if (!(await isAuthenticated(page))) {
+    // Not authenticated - log in
     await ensureTestUserExists(page);
     await saveAuthState(page);
   }
 
+  // Navigate to root - test can go wherever it needs from here
+  await page.goto(`${APP_URL}/`, { waitUntil: "networkidle" });
+
   return helper;
+}
+
+async function fetchConvexLogs(maxLines = 30): Promise<string> {
+  return new Promise(resolve => {
+    const logs: string[] = [];
+    const proc = spawn(
+      "bunx",
+      ["convex", "logs", "--history", String(maxLines), "--success"],
+      {
+        stdio: ["ignore", "pipe", "pipe"],
+        cwd: dirname(fileURLToPath(import.meta.url)) + "/..",
+      },
+    );
+
+    proc.stdout.on("data", (data: Buffer) => {
+      const text = data.toString();
+      for (const line of text.split("\n")) {
+        if (line.trim() && !line.startsWith("Watching logs")) {
+          logs.push(line);
+        }
+      }
+    });
+
+    proc.stderr.on("data", (data: Buffer) => {
+      const text = data.toString();
+      if (!text.includes("WebSocket") && !text.includes("Attempting reconnect")) {
+        logs.push(`[stderr] ${text.trim()}`);
+      }
+    });
+
+    const timeout = setTimeout(() => {
+      proc.kill("SIGTERM");
+      resolve(logs.length > 0 ? logs.join("\n") : "(No recent log entries)");
+    }, 5000);
+
+    proc.on("close", () => {
+      clearTimeout(timeout);
+      resolve(logs.length > 0 ? logs.join("\n") : "(No recent log entries)");
+    });
+
+    proc.on("error", () => {
+      clearTimeout(timeout);
+      resolve("(Failed to fetch Convex logs)");
+    });
+  });
+}
+
+export async function runTest(
+  testName: string,
+  testFn: (helper: PageHelper) => Promise<void>,
+): Promise<void> {
+  console.log(`\n🧪 Running: ${testName}\n`);
+
+  const helper = await createPageHelper();
+
+  try {
+    await testFn(helper);
+    console.log(`\n✅ ${testName} PASSED\n`);
+  } catch (error) {
+    console.error(`\n❌ ${testName} FAILED\n`);
+    console.error("Error:", error instanceof Error ? error.message : error);
+
+    try {
+      await helper.screenshot(`error-${Date.now()}.png`);
+      await helper.printDebugInfo();
+      
+      console.log("\n🔧 Convex Backend Logs:");
+      console.log("─".repeat(60));
+      const convexLogs = await fetchConvexLogs();
+      console.log(convexLogs);
+      console.log("─".repeat(60));
+    } catch (debugError) {
+      console.error("Failed to capture debug info:", debugError);
+    }
+
+    throw error;
+  } finally {
+    await helper.close();
+  }
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {

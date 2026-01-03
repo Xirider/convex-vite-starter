@@ -62,6 +62,27 @@ bun run logs:fetch
 
 The `sync` command uses `convex dev --once` which pushes your functions and exits immediately. Use `bun run logs:fetch` to get recent backend logs (console.log, errors, function executions) — it fetches logs and exits after 5 seconds.
 
+### Running E2E Tests
+
+To run Playwright e2e tests after building:
+
+```bash
+# 1. Build the app
+bun run sync:build
+
+# 2. Run your test (starts preview server automatically)
+bun run test scripts/demo-test.ts
+
+# Or run multiple tests
+bun run test scripts/test-feature1.ts scripts/test-feature2.ts
+```
+
+The `test` command handles the full lifecycle:
+1. Starts `vite preview` (serves built files on port 4173)
+2. Waits for server to be ready
+3. Runs your test with `APP_URL` set correctly
+4. Stops the server when done
+
 ### Troubleshooting
 
 **WebSocket errors with `convex env`**: If you see connection errors, read `.env.local` directly:
@@ -71,20 +92,21 @@ grep VITE_CONVEX_URL .env.local
 
 ## Scripts
 
-| Command              | Description                                 |
-| -------------------- | ------------------------------------------- |
-| `bun run dev`        | Start Vite dev server                       |
-| `bun run build`      | Build for production                        |
-| `bun run sync`       | Push Convex functions once (no watching)    |
-| `bun run sync:build` | Push Convex + build frontend in one command |
-| `bun run logs`       | Tail Convex backend logs (streaming)        |
-| `bun run logs:fetch` | Fetch recent logs and exit (agent-friendly) |
-| `bun run check`      | Lint + format check with Biome              |
-| `bun run format`     | Format & fix with Biome                     |
-| `bun run lint`       | Lint only with Biome                        |
-| `bun run screenshot` | Take screenshot of running app              |
-| `bun run test:auth`  | Set up test user authentication             |
-| `bun run test:demo`  | Run demo test with test user                |
+| Command              | Description                                   |
+| -------------------- | --------------------------------------------- |
+| `bun run dev`        | Start Vite dev server                         |
+| `bun run build`      | Build for production                          |
+| `bun run sync`       | Push Convex functions once (no watching)      |
+| `bun run sync:build` | Push Convex + build frontend in one command   |
+| `bun run test <file>`| Run e2e test (starts server, runs test, stops)|
+| `bun run logs`       | Tail Convex backend logs (streaming)          |
+| `bun run logs:fetch` | Fetch recent logs and exit (agent-friendly)   |
+| `bun run check`      | Lint + format check with Biome                |
+| `bun run format`     | Format & fix with Biome                       |
+| `bun run lint`       | Lint only with Biome                          |
+| `bun run screenshot` | Take screenshot of running app                |
+| `bun run test:auth`  | Set up test user authentication               |
+| `bun run test:demo`  | Run demo test with test user                  |
 
 ## Project Structure
 
@@ -386,16 +408,47 @@ A special test user is available for agents and Playwright testing that bypasses
 | Password | `TestAgent123!`    |
 | Name     | `Test Agent`       |
 
-**Usage with Playwright:**
+**Usage with Playwright (recommended):**
+
+Use `runTest()` for automatic error handling. The page is **already logged in** as the test user when your test function runs:
+
+```ts
+import { runTest } from "./scripts/auth";
+
+runTest("My Feature Test", async helper => {
+  const { page } = helper;
+  // ✅ Already authenticated as test user (agent@test.local)
+  // ✅ Starts on / - navigate to the page you want to test
+
+  await helper.goto("/dashboard");
+  await page.click("button");
+  await helper.screenshot("my-feature.png");
+
+  const hasElement = await page.locator("text=Success").isVisible();
+  if (!hasElement) {
+    throw new Error("Expected Success message");
+  }
+}).catch(() => process.exit(1));
+```
+
+On failure, you'll automatically see:
+- 📸 Error screenshot saved to `tmp/error-{timestamp}.png`
+- 🔍 Current URL and page title
+- 📄 Full page text content
+- 📋 All browser console logs (with ❌ for errors, ⚠️ for warnings)
+- 🔧 Recent Convex backend logs (queries, mutations, actions, errors)
+
+**Manual control (if needed):**
 
 ```ts
 import { createPageHelper } from "./scripts/auth";
 
 const helper = await createPageHelper();
-// helper.page is now logged in as the test user
+// ✅ Already authenticated as test user (agent@test.local)
+// ✅ Starts on / - navigate wherever you need
 
 // Navigate and interact
-await helper.page.goto("http://localhost:5173/some-page");
+await helper.goto("/some-page");
 await helper.page.click("button");
 
 // Debugging helpers
