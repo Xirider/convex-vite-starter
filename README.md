@@ -83,6 +83,22 @@ The `test` command handles the full lifecycle:
 3. Runs your test with `APP_URL` set correctly
 4. Stops the server when done
 
+### Taking Screenshots
+
+```bash
+# After building
+bun run sync:build
+
+# Screenshot the landing page (default)
+bun run screenshot
+
+# Screenshot a specific page with custom filename
+bun run screenshot /dashboard dashboard.png
+bun run screenshot /settings settings.png
+```
+
+The `screenshot` command also starts the preview server automatically.
+
 ### Troubleshooting
 
 **WebSocket errors with `convex env`**: If you see connection errors, read `.env.local` directly:
@@ -92,21 +108,21 @@ grep VITE_CONVEX_URL .env.local
 
 ## Scripts
 
-| Command              | Description                                   |
-| -------------------- | --------------------------------------------- |
-| `bun run dev`        | Start Vite dev server                         |
-| `bun run build`      | Build for production                          |
-| `bun run sync`       | Push Convex functions once (no watching)      |
-| `bun run sync:build` | Push Convex + build frontend in one command   |
-| `bun run test <file>`| Run e2e test (starts server, runs test, stops)|
-| `bun run logs`       | Tail Convex backend logs (streaming)          |
-| `bun run logs:fetch` | Fetch recent logs and exit (agent-friendly)   |
-| `bun run check`      | Lint + format check with Biome                |
-| `bun run format`     | Format & fix with Biome                       |
-| `bun run lint`       | Lint only with Biome                          |
-| `bun run screenshot [path] [name]` | Take screenshot of a page       |
-| `bun run test:auth`  | Set up test user authentication               |
-| `bun run test:demo`  | Run demo test with test user                  |
+| Command                            | Description                                    |
+| ---------------------------------- | ---------------------------------------------- |
+| `bun run dev`                      | Start Vite dev server                          |
+| `bun run build`                    | Build for production                           |
+| `bun run sync`                     | Push Convex functions once (no watching)       |
+| `bun run sync:build`               | Push Convex + build frontend in one command    |
+| `bun run test <file>`              | Run e2e test (starts server, runs test, stops) |
+| `bun run logs`                     | Tail Convex backend logs (streaming)           |
+| `bun run logs:fetch`               | Fetch recent logs and exit (agent-friendly)    |
+| `bun run check`                    | Lint + format check with Biome                 |
+| `bun run format`                   | Format & fix with Biome                        |
+| `bun run lint`                     | Lint only with Biome                           |
+| `bun run screenshot [path] [name]` | Take screenshot of a page                      |
+| `bun run test:auth`                | Set up test user authentication                |
+| `bun run test:demo`                | Run demo test with test user                   |
 
 ## Project Structure
 
