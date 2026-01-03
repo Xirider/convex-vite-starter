@@ -1,4 +1,5 @@
 import { useAuthActions } from "@convex-dev/auth/react";
+import { FlaskConical, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "./ui/button";
 import {
@@ -53,37 +54,40 @@ export function TestUserLoginSection() {
 
   return (
     <>
-      <Card className="border-dashed border-2 border-amber-500/50 bg-amber-50/50 dark:bg-amber-950/20">
+      <Card className="border-dashed border-amber-500/40 bg-amber-50/50 dark:bg-amber-950/20">
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <span className="text-xl">🧪</span>
+          <CardTitle className="text-base flex items-center gap-2">
+            <FlaskConical className="size-4 text-amber-600" />
             Preview Mode
           </CardTitle>
-          <CardDescription>
-            This is a preview deployment. Sign in instantly as a test user to
-            explore the app.
+          <CardDescription className="text-sm">
+            Sign in instantly as a test user to explore the app
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-3">
           <Button
             onClick={handleTestLogin}
             disabled={loading}
             className="w-full bg-amber-600 hover:bg-amber-700 text-white"
-            size="lg"
           >
-            {loading ? "Signing in..." : "Continue as Test User →"}
+            {loading && <Loader2 className="size-4 animate-spin" />}
+            {loading ? "Signing in..." : "Continue as Test User"}
           </Button>
-          {error && <p className="text-sm text-destructive mt-2">{error}</p>}
-          <p className="text-xs text-muted-foreground mt-3 text-center">
-            Test user: {TEST_USER.email}
+          {error && (
+            <p className="text-sm text-destructive bg-destructive/10 rounded-md px-3 py-2">
+              {error}
+            </p>
+          )}
+          <p className="text-xs text-muted-foreground text-center">
+            {TEST_USER.email}
           </p>
         </CardContent>
       </Card>
 
-      <div className="relative my-6">
+      <div className="relative py-4">
         <Separator />
         <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-background px-3 text-xs text-muted-foreground">
-          or sign in with your account
+          or continue with
         </span>
       </div>
     </>

@@ -1,6 +1,7 @@
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useQuery } from "convex/react";
-import { LogOut, Moon, Sun, User } from "lucide-react";
+import { LogOut, Moon, Settings, Sun, User } from "lucide-react";
+import { Link } from "react-router-dom";
 import { api } from "../../convex/_generated/api";
 import { useTheme } from "../contexts/ThemeContext";
 import { Avatar, AvatarFallback } from "./ui/avatar";
@@ -21,37 +22,46 @@ export function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
-          <Avatar className="h-8 w-8">
-            <AvatarFallback>
+        <Button variant="ghost" size="icon" className="rounded-full">
+          <Avatar className="size-8">
+            <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
               {user?.name?.charAt(0).toUpperCase() || (
-                <User className="h-4 w-4" />
+                <User className="size-4" />
               )}
             </AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
-        <div className="px-2 py-1.5">
-          <p className="text-sm font-medium">{user?.name || "User"}</p>
-          <p className="text-xs text-muted-foreground">{user?.email}</p>
+        <div className="px-2 py-2">
+          <p className="text-sm font-medium truncate">{user?.name || "User"}</p>
+          <p className="text-xs text-muted-foreground truncate">
+            {user?.email}
+          </p>
         </div>
         <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link to="/settings" className="cursor-pointer">
+            <Settings className="size-4" />
+            Settings
+          </Link>
+        </DropdownMenuItem>
         {switchable && (
           <DropdownMenuItem onClick={toggleTheme}>
             {theme === "light" ? (
-              <Moon className="mr-2 h-4 w-4" />
+              <Moon className="size-4" />
             ) : (
-              <Sun className="mr-2 h-4 w-4" />
+              <Sun className="size-4" />
             )}
             {theme === "light" ? "Dark mode" : "Light mode"}
           </DropdownMenuItem>
         )}
+        <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => signOut()}
-          className="text-destructive focus:text-destructive"
+          className="text-destructive focus:text-destructive focus:bg-destructive/10"
         >
-          <LogOut className="mr-2 h-4 w-4" />
+          <LogOut className="size-4" />
           Sign out
         </DropdownMenuItem>
       </DropdownMenuContent>

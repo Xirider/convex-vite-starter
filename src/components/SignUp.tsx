@@ -1,4 +1,5 @@
 import { useAuthActions } from "@convex-dev/auth/react";
+import { ArrowLeft, Loader2, Mail } from "lucide-react";
 import { useState } from "react";
 import { Button } from "./ui/button";
 import {
@@ -26,8 +27,8 @@ export function SignUp() {
   if (step === "signUp") {
     return (
       <Card>
-        <CardHeader>
-          <CardTitle>Create Account</CardTitle>
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-xl">Create Account</CardTitle>
           <CardDescription>Enter your details to get started</CardDescription>
         </CardHeader>
         <CardContent>
@@ -60,6 +61,7 @@ export function SignUp() {
                 name="name"
                 type="text"
                 placeholder="Your name"
+                autoComplete="name"
                 required
               />
             </div>
@@ -70,6 +72,7 @@ export function SignUp() {
                 name="email"
                 type="email"
                 placeholder="you@example.com"
+                autoComplete="email"
                 required
               />
             </div>
@@ -81,13 +84,22 @@ export function SignUp() {
                 type="password"
                 placeholder="••••••••"
                 minLength={6}
+                autoComplete="new-password"
                 required
               />
+              <p className="text-xs text-muted-foreground">
+                Must be at least 6 characters
+              </p>
             </div>
             <input name="flow" value="signUp" type="hidden" />
-            {error && <p className="text-sm text-destructive">{error}</p>}
+            {error && (
+              <p className="text-sm text-destructive bg-destructive/10 rounded-md px-3 py-2">
+                {error}
+              </p>
+            )}
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Creating account..." : "Sign Up"}
+              {loading && <Loader2 className="size-4 animate-spin" />}
+              {loading ? "Creating account..." : "Create Account"}
             </Button>
           </form>
         </CardContent>
@@ -97,9 +109,12 @@ export function SignUp() {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Verify your email</CardTitle>
-        <CardDescription>
+      <CardHeader className="space-y-1">
+        <div className="mx-auto size-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+          <Mail className="size-6 text-primary" />
+        </div>
+        <CardTitle className="text-xl text-center">Check your email</CardTitle>
+        <CardDescription className="text-center">
           We sent a verification code to {step.email}
         </CardDescription>
       </CardHeader>
@@ -129,13 +144,19 @@ export function SignUp() {
               type="text"
               placeholder="Enter 6-digit code"
               autoComplete="one-time-code"
+              className="text-center tracking-widest"
               required
             />
           </div>
           <input name="flow" value="email-verification" type="hidden" />
           <input name="email" value={step.email} type="hidden" />
-          {error && <p className="text-sm text-destructive">{error}</p>}
+          {error && (
+            <p className="text-sm text-destructive bg-destructive/10 rounded-md px-3 py-2">
+              {error}
+            </p>
+          )}
           <Button type="submit" className="w-full" disabled={loading}>
+            {loading && <Loader2 className="size-4 animate-spin" />}
             {loading ? "Verifying..." : "Verify Email"}
           </Button>
           <Button
@@ -144,6 +165,7 @@ export function SignUp() {
             className="w-full"
             onClick={() => setStep("signUp")}
           >
+            <ArrowLeft className="size-4" />
             Back to sign up
           </Button>
         </form>
