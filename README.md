@@ -544,6 +544,7 @@ This template customizes some Tailwind/shadcn defaults for simplified usage:
 | `.container`               | Auto-centered with responsive padding (see `index.css`). Use directly without `mx-auto`/`px-*`. For custom widths, use `max-w-*` with `mx-auto px-4` |
 | `.flex`                    | Has `min-width: 0` and `min-height: 0` by default                                                                                                    |
 | `button` variant `outline` | Uses transparent background (not `bg-background`). Add bg color class manually if needed                                                             |
+| `<Empty>`                  | Supports shorthand props: `<Empty icon={<Icon />} title="..." description="..." />`. Also supports child composition for advanced layouts            |
 
 
 ## Convex Cheatsheet
