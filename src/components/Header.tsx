@@ -1,6 +1,7 @@
 import { useConvexAuth } from "convex/react";
 import { ArrowRight } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import { APP_NAME } from "@/lib/constants";
 import { Button } from "./ui/button";
 
 export function Header() {
@@ -23,7 +24,7 @@ export function Header() {
                 M
               </span>
             </div>
-            <span className="hidden sm:inline">My App</span>
+            <span className="hidden sm:inline">{APP_NAME}</span>
           </Link>
 
           <nav className="flex items-center gap-2">

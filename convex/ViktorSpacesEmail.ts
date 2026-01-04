@@ -1,4 +1,5 @@
 import { Email } from "@convex-dev/auth/providers/Email";
+import { APP_NAME } from "./constants";
 
 declare const process: { env: Record<string, string | undefined> };
 
@@ -41,7 +42,7 @@ async function sendEmail({
       project_name: projectName,
       project_secret: projectSecret,
       to_email: email,
-      subject,
+      subject: `${subject} - ${APP_NAME}`,
       html_content: `
         <div style="font-family: sans-serif; max-width: 400px; margin: 0 auto; padding: 20px;">
           <h2 style="color: #333;">${heading}</h2>
@@ -50,9 +51,11 @@ async function sendEmail({
             <span style="font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #333;">${token}</span>
           </div>
           <p style="color: #999; font-size: 12px;">This code expires in 15 minutes.</p>
+          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+          <p style="color: #999; font-size: 12px; text-align: center;">This email was sent by ${APP_NAME}</p>
         </div>
       `,
-      text_content: `${heading}\n\n${description}\n\nYour code is: ${token}\n\nThis code expires in 15 minutes.`,
+      text_content: `${heading}\n\n${description}\n\nYour code is: ${token}\n\nThis code expires in 15 minutes.\n\n---\nThis email was sent by ${APP_NAME}`,
       email_type: "otp",
     }),
   });

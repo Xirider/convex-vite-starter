@@ -203,7 +203,10 @@ The project uses shared layout components for consistency:
 - **Authenticated pages** use `AppLayout` with a sidebar (shadcn/ui sidebar component)
 - On mobile, the sidebar becomes a full-screen slide-out menu
 
-**To change the app name or branding** — edit `Header.tsx` (public) and `AppSidebar.tsx` (authenticated).
+**To change the app name** — update `APP_NAME` in these files:
+- `src/lib/constants.ts` — used by `Header.tsx` and `AppSidebar.tsx`
+- `convex/constants.ts` — used by email templates in `ViktorSpacesEmail.ts`
+- `index.html` — the `<title>` tag (static HTML, must be updated manually)
 
 ### 3. Remove Unused Pages
 

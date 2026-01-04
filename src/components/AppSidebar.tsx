@@ -3,6 +3,7 @@ import { useQuery } from "convex/react";
 import { LayoutDashboard, LogOut, Moon, Settings, Sun } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useTheme } from "@/contexts/ThemeContext";
+import { APP_NAME } from "@/lib/constants";
 import { api } from "../../convex/_generated/api";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import {
@@ -156,7 +157,7 @@ function SidebarHeaderContent() {
         <div className="size-8 rounded-lg bg-primary flex items-center justify-center">
           <span className="text-primary-foreground font-bold text-sm">M</span>
         </div>
-        <span>My App</span>
+        <span>{APP_NAME}</span>
       </Link>
     </SidebarHeader>
   );
