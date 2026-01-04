@@ -325,7 +325,7 @@ async function fetchConvexLogs(maxLines = 30): Promise<string> {
       ["convex", "logs", "--history", String(maxLines), "--success"],
       {
         stdio: ["ignore", "pipe", "pipe"],
-        cwd: dirname(fileURLToPath(import.meta.url)) + "/..",
+        cwd: `${dirname(fileURLToPath(import.meta.url))}/..`,
       },
     );
 

@@ -53,7 +53,7 @@ interface TestResult {
 
 function getTestLabel(testFile: string): string {
   const name = testFile.replace(/^scripts\//, "").replace(/\.ts$/, "");
-  return name.length > 20 ? name.slice(0, 17) + "..." : name.padEnd(20);
+  return name.length > 20 ? `${name.slice(0, 17)}...` : name.padEnd(20);
 }
 
 async function runTest(testFile: string): Promise<TestResult> {
