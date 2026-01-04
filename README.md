@@ -641,6 +641,8 @@ export default defineSchema({
 });
 ```
 
+**Note**: Every document automatically has `_id` and `_creationTime` fields. Don't define these in your schema. Also, `_creationTime` is auto-appended to all indexes — don't include it explicitly or you'll get an error.
+
 ### Actions
 
 ```ts
