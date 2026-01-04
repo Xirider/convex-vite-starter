@@ -415,7 +415,7 @@ Email templates are in `convex/ViktorSpacesEmail.ts`.
 
 ### Internal Apps (Domain Restriction)
 
-For internal apps, restrict signups to the user's company Slack email domain. Extract the allowed domain from the user's Slack email address (by listing all the users in the company Slack workspace) and modify `convex/ViktorSpacesEmail.ts`:
+For internal apps, YOU HAVE TO restrict signups to the user's company Slack email domain. Extract the allowed domain from the user's Slack email address (do not assume email address by other context. you have to get the list of all email addresses to find all the dmoans from them by listing all the users in the company Slack workspace via your tool) and modify `convex/ViktorSpacesEmail.ts`:
 
 ```ts
 const ALLOWED_DOMAINS = ["yourcompany.com"]; // Use your Slack workspace email domains
