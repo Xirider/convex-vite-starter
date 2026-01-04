@@ -1,4 +1,4 @@
-import { spawn, type ChildProcess } from "node:child_process";
+import { type ChildProcess, spawn } from "node:child_process";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createPageHelper } from "./auth";
@@ -53,7 +53,9 @@ async function main() {
     const ready = await waitForServer(PREVIEW_URL, MAX_WAIT_MS);
 
     if (!ready) {
-      console.error("❌ Server failed to start. Run 'bun run sync:build' first.");
+      console.error(
+        "❌ Server failed to start. Run 'bun run sync:build' first.",
+      );
       process.exit(1);
     }
 

@@ -5,7 +5,7 @@ runTest("Demo Test", async helper => {
 
   console.log("📍 Testing /dashboard route...");
   await helper.goto("/dashboard");
-  
+
   await helper.screenshot("demo-dashboard.png");
 
   const hasWelcome = await page
@@ -42,7 +42,9 @@ runTest("Demo Test", async helper => {
   await helper.goto("/");
   await helper.screenshot("demo-landing.png");
   const landingContent = await page.locator("body").innerText();
-  const hasLanding = landingContent.includes("Main Headline") || landingContent.includes("Get Started");
+  const hasLanding =
+    landingContent.includes("Main Headline") ||
+    landingContent.includes("Get Started");
   console.log(`   ✓ Landing page content: ${hasLanding}`);
   console.log(`   ✓ URL: ${page.url()}`);
 

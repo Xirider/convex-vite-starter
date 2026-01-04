@@ -1,19 +1,32 @@
 import { spawn } from "node:child_process";
-import { existsSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { existsSync, readdirSync, statSync, unlinkSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
-import { dirname, join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Browser, BrowserContext, ConsoleMessage, Page } from "playwright";
 import { chromium } from "playwright";
 import { TEST_USER } from "./testUser";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const TMP_DIR = join(__dirname, "..", "tmp");
+
+const AUTH_STATE_MAX_AGE_MINUTES = 50;
 
 function getAppUrl(): string {
   return process.env.APP_URL || "http://localhost:5173";
 }
-const AUTH_STATE_PATH = join(__dirname, "..", "tmp", "auth-state.json");
-const TMP_DIR = join(__dirname, "..", "tmp");
+
+function getTestId(): string {
+  const scriptPath = process.argv[1] || "default";
+  const name = basename(scriptPath, ".ts");
+  const hash = createHash("md5").update(scriptPath).digest("hex").slice(0, 8);
+  return `${name}-${hash}`;
+}
+
+function getAuthStatePath(): string {
+  return join(TMP_DIR, `auth-state-${getTestId()}.json`);
+}
 
 export interface ConsoleLog {
   type: string;
@@ -203,17 +216,58 @@ export async function signInTestUser(page: Page): Promise<void> {
 
 export async function saveAuthState(page: Page): Promise<void> {
   await mkdir(TMP_DIR, { recursive: true });
+  const authStatePath = getAuthStatePath();
   const context = page.context();
-  await context.storageState({ path: AUTH_STATE_PATH });
-  console.log(`[Auth] Auth state saved to ${AUTH_STATE_PATH}`);
+  await context.storageState({ path: authStatePath });
+  console.log(`[Auth] Auth state saved to ${authStatePath}`);
 }
 
 export async function loadAuthState(): Promise<string | undefined> {
-  if (existsSync(AUTH_STATE_PATH)) {
-    console.log(`[Auth] Loading auth state from ${AUTH_STATE_PATH}`);
-    return AUTH_STATE_PATH;
+  const authStatePath = getAuthStatePath();
+
+  if (!existsSync(authStatePath)) {
+    return undefined;
   }
-  return undefined;
+
+  try {
+    const stats = statSync(authStatePath);
+    const ageMinutes = (Date.now() - stats.mtimeMs) / 1000 / 60;
+
+    if (ageMinutes > AUTH_STATE_MAX_AGE_MINUTES) {
+      console.log(
+        `[Auth] Auth state expired (${ageMinutes.toFixed(0)}m old, max ${AUTH_STATE_MAX_AGE_MINUTES}m), will re-authenticate`,
+      );
+      unlinkSync(authStatePath);
+      return undefined;
+    }
+
+    console.log(
+      `[Auth] Loading auth state from ${authStatePath} (${ageMinutes.toFixed(0)}m old)`,
+    );
+    return authStatePath;
+  } catch {
+    return undefined;
+  }
+}
+
+export function clearAllAuthStates(): void {
+  if (!existsSync(TMP_DIR)) return;
+
+  const files = readdirSync(TMP_DIR);
+  let cleared = 0;
+
+  for (const file of files) {
+    if (file.startsWith("auth-state-") && file.endsWith(".json")) {
+      try {
+        unlinkSync(join(TMP_DIR, file));
+        cleared++;
+      } catch {}
+    }
+  }
+
+  if (cleared > 0) {
+    console.log(`[Auth] Cleared ${cleared} auth state file(s)`);
+  }
 }
 
 export async function createAuthenticatedBrowser(): Promise<{
@@ -286,7 +340,10 @@ async function fetchConvexLogs(maxLines = 30): Promise<string> {
 
     proc.stderr.on("data", (data: Buffer) => {
       const text = data.toString();
-      if (!text.includes("WebSocket") && !text.includes("Attempting reconnect")) {
+      if (
+        !text.includes("WebSocket") &&
+        !text.includes("Attempting reconnect")
+      ) {
         logs.push(`[stderr] ${text.trim()}`);
       }
     });
@@ -326,7 +383,7 @@ export async function runTest(
     try {
       await helper.screenshot(`error-${Date.now()}.png`);
       await helper.printDebugInfo();
-      
+
       console.log("\n🔧 Convex Backend Logs:");
       console.log("─".repeat(60));
       const convexLogs = await fetchConvexLogs();
@@ -338,6 +395,9 @@ export async function runTest(
 
     throw error;
   } finally {
+    try {
+      await saveAuthState(helper.page);
+    } catch {}
     await helper.close();
   }
 }
