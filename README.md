@@ -481,7 +481,7 @@ export default http;
 
 This template includes `convex/viktorTools.ts` which lets your app call Viktor's SDK functions (AI search, image generation, etc.) from Convex actions.
 
-### Using the Included Search Action
+### Using the Included Tools
 
 ```tsx
 import { useAction } from "convex/react";
@@ -492,27 +492,25 @@ function SearchComponent() {
 
   const handleSearch = async () => {
     const result = await search({ query: "What is the capital of France?" });
-    if (result.success) {
-      console.log(result.result);
-    }
+    console.log(result); // Returns the AI summary directly as a string
   };
 }
 ```
 
 ### Adding More Tools
 
-Any SDK function can be called via the `callToolGateway` helper. Add new actions to `convex/viktorTools.ts`:
+To add a new tool, first test it to see the response shape, then create a typed wrapper in `convex/viktorTools.ts`. Any tool from the SDK is available to be added. If you need new functionality, pls check the SDK what is available there. It has tons of usefull stuff like ai structured output, search api, image generation, etc.
 
 ```ts
 export const generateImage = action({
   args: { prompt: v.string() },
+  returns: v.string(),
   handler: async (_ctx, { prompt }) => {
-    return await callToolGateway("text2im", { prompt, aspect_ratio: "1:1" });
+    const result = await callTool<{ response_text: string }>("text2im", { prompt });
+    return result.response_text;
   },
 });
 ```
-
-The `role` is the SDK tool's identifier, and `arguments` are passed directly to the tool.
 
 ## 🎨 Design Guide
 

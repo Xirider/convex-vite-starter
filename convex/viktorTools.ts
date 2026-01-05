@@ -7,7 +7,7 @@
  * - file_to_markdown: Convert PDF/DOCX/XLSX files to markdown
  * - And all MCP integration tools configured for your user
  *
- * To add a new tool, first test it to see the response shape,
+ * To add a new tool, first test it to see the response shape.
  */
 import { v } from "convex/values";
 import { action } from "./_generated/server";
@@ -18,40 +18,27 @@ const VIKTOR_API_URL = process.env.VIKTOR_SPACES_API_URL!;
 const PROJECT_NAME = process.env.VIKTOR_SPACES_PROJECT_NAME!;
 const PROJECT_SECRET = process.env.VIKTOR_SPACES_PROJECT_SECRET!;
 
-type ToolResult<T> = { ok: true; data: T } | { ok: false; error: string };
-
-async function callTool<T>(
-  role: string,
-  args: Record<string, unknown> = {},
-): Promise<ToolResult<T>> {
-  const response = await fetch(
-    `${VIKTOR_API_URL}/api/viktor-spaces/tools/call`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        project_name: PROJECT_NAME,
-        project_secret: PROJECT_SECRET,
-        role,
-        arguments: args,
-      }),
-    },
-  );
+async function callTool<T>(role: string, args: Record<string, unknown> = {}): Promise<T> {
+  const response = await fetch(`${VIKTOR_API_URL}/api/viktor-spaces/tools/call`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      project_name: PROJECT_NAME,
+      project_secret: PROJECT_SECRET,
+      role,
+      arguments: args,
+    }),
+  });
 
   if (!response.ok) {
-    return { ok: false, error: `HTTP ${response.status}: ${await response.text()}` };
+    throw new Error(`HTTP ${response.status}: ${await response.text()}`);
   }
 
   const json = await response.json();
   if (!json.success) {
-    return { ok: false, error: json.error ?? "Tool call failed" };
+    throw new Error(json.error ?? "Tool call failed");
   }
-  return { ok: true, data: json.result as T };
-}
-
-function unwrap<T>(result: ToolResult<T>): T {
-  if (!result.ok) throw new Error(result.error);
-  return result.data;
+  return json.result as T;
 }
 
 export const quickAiSearch = action({
@@ -61,7 +48,7 @@ export const quickAiSearch = action({
     const result = await callTool<{ search_response: string }>("quick_ai_search", {
       search_question: query,
     });
-    return unwrap(result).search_response;
+    return result.search_response;
   },
 });
 
@@ -84,6 +71,6 @@ export const generateImage = action({
       prompt,
       aspect_ratio: aspectRatio ?? "1:1",
     });
-    return unwrap(result).response_text;
+    return result.response_text;
   },
 });
